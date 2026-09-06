@@ -1,36 +1,51 @@
 # 七十一日行程 · 71 Day Journey
 
-徐远鹏先生 2026 年 8 月 25 日至 11 月 3 日的行程看板，覆盖 **71 天、17 个阶段、18 个路线节点**。提供北京时间进度、完整时间线、助理编辑与执行核验。
+2026 年 8 月 25 日至 11 月 3 日，**71 天、17 个阶段、18 个路线节点**。今日安排、共享协作与可安装的离线行程。
 
-**[打开在线应用](https://xuyuanpeng-71-day-journey.danyelxu.chatgpt.site)** · [源代码](https://github.com/xudaniel/xuyuanpeng-71-day-journey)
+**[公开行程 · GitHub Pages](https://xudaniel.github.io/xuyuanpeng-71-day-journey/)** · **[公开行程 · Sites](https://xuyuanpeng-71-day-journey.danyelxu.chatgpt.site/)** · **[登录协作空间](https://xuyuanpeng-71-day-journey.danyelxu.chatgpt.site/shared.html)**
 
-> 在线应用已公开，任何人均可通过链接访问，无需登录。核验记录与助理备注保存在当前浏览器，不会自动跨设备同步。
+## 三个主要功能
 
-## 功能
+### 今日随行
 
-- **实时行程概览**：北京时间日期、行程日、当前计划、阶段剩余天数与下一转场。跨日自动刷新。
-- **完整时间线**：按城市、人物、公司、中文日期或 `YYYY-MM-DD` 搜索；按全部、已结束、已核验、进行中、未开始筛选。
-- **执行核验**：每阶段可独立标记完成，显示核验比例；时间进度与实际核验分开统计。
-- **助理编辑**：修改日期显示、地点、核心安排与备注；保留原始行程，支持恢复内容。
-- **备份与恢复**：导出 JSON，换设备后导入。核验记录合并，已有同阶段编辑优先保留。
-- **日历与打印**：导出全部 17 个阶段的 `.ics` 日历，或打印／另存为 PDF。
-- **手机与键盘可用**：响应式布局、明确的焦点提示、可访问的展开状态、无结果提示及当前阶段定位。
+首页优先展示当天安排、已确认时间、住宿与下一转场，可切换日期查看。已知地址可一键复制。点击「添加日历提醒」下载当天 `.ics`：有准确时刻的活动附带提前 30 分钟提醒；时间待定的安排导出为全天事件，不虚构时刻。提醒需要将文件导入手机或电脑日历后才会生效。
 
-## 使用方法
+进度按北京时间计算；日本及多伦多的已确认时刻标明当地时区，导出时转为对应 UTC 时间。来源仍为原始行程资料，并非航班或酒店实时查询。
 
-1. 打开应用，查看当前计划与下一转场。
-2. 点击阶段展开详情，核对实际安排后勾选「标记为已核验完成」。
-3. 在页面底部选择「助理编辑」修改本机备注和显示内容。
-4. 点击「备份进度」下载文件；在另一台设备点击「恢复进度」导入。
-5. 点击顶部「导出日历」，将文件导入 Apple 日历、Outlook 或 Google 日历。
+### 私密协作空间
 
-**进度定义**：时间比例 = 当前行程日 ÷ 71，含当天；出发前为 0%，11 月 3 日为 100%。「今日后剩余」不包含当天。「已结束」只表示计划日期已过，不代表执行完成。「核验进度」= 已核验阶段数 ÷ 17。
+使用 ChatGPT 登录，行程所有者可按邮箱加入协作者。每个阶段可共享地点、日期显示、核心安排、备注与核验状态。数据保存到服务端 D1，打开的页面每 15 秒检查更新。每次修改保留作者与时间，支持撤销最近一次修改、恢复历史版本。
 
-**日期说明**：所有进度按 `Asia/Shanghai` 计算，不随设备时区或夏令时变化。日历导出为全天阶段，不会将文字中的航班时刻转为定时事件。日历的结束日期按标准使用次日排他边界。助理编辑中的「日期显示」只修改文字；真实日期需在 `itinerary.js` 修改 `start` / `end`。
+- 匿名访客与未获授权的登录用户无法读取或更改共享记录。
+- 编辑权限由服务端检查，只有所有者可增删协作者。
+- 同阶段版本冲突时拒绝覆盖，并保留当前输入供用户处理。
+- 日期显示只改变文字，不改变原始进度计算日期。
+- 添加邮箱不会发送邮件；请自行将协作链接分享给对方。
+- 共享内容不自动发布到公开行程，也不缓存到离线存储。
 
-## 本地运行
+原公开页面的本机助理编辑、JSON 备份恢复仍可使用，与服务端协作记录独立；旧版笔记不会自动上传。
 
-无需安装前端依赖；使用 Python 3 启动静态服务器：
+### 安装、离线与分享
+
+点击「安装到手机」，或在 iPhone Safari 中选择「分享 → 添加到主屏幕」。Android 支持的浏览器会显示安装提示。首次联网访问并完成缓存后，可离线打开公开行程；页面显示离线可用状态和资料更新日期。共享空间需要联网登录。
+
+「分享行程」提供 GitHub 网页版二维码、复制链接、系统分享与二维码下载。分享只包含公开链接，不含本机或共享备注。
+
+2026-09-07 使用 443.cn 对 GitHub 链接进行一次多地 HTTP 测试：38 个大陆节点中 36 个返回 200，上海电信与河北衡水联通超时。测试反映当次 HTTP 可达性，不代表完整页面渲染或长期可用性；未部署新的大陆镜像。
+
+## 原有功能
+
+- 完整路线与可展开时间线；按城市、人物、公司、中文或 ISO 日期搜索。
+- 全部、已结束、已核验、进行中、未开始筛选及定位当前阶段。
+- 17 阶段完整日历导出、打印／另存 PDF。
+- 本机核验进度、助理编辑、JSON 备份与合并恢复。
+- 桌面／手机布局、键盘焦点、屏幕阅读器展开状态与无结果提示。
+
+时间进度 = 当前行程日 ÷ 71（含当天）；核验进度 = 已核验阶段数 ÷ 17。「已结束」仅指计划日期已过，不等同于实际核验完成。
+
+## 本地运行公开页面
+
+无需前端依赖：
 
 ```sh
 git clone https://github.com/xudaniel/xuyuanpeng-71-day-journey.git
@@ -38,51 +53,48 @@ cd xuyuanpeng-71-day-journey
 python3 -m http.server 8000
 ```
 
-在浏览器打开 <http://localhost:8000>。也可直接打开 `index.html`，但浏览器对本地文件的存储支持可能不同，推荐使用本地服务器。应用资源全部随仓库提供，没有外部字体、追踪脚本或第三方运行时依赖。
+访问 <http://localhost:8000>。离线功能要求 HTTPS 或 localhost，直接打开文件不支持 Service Worker。本地静态服务器不运行协作 API；页面协作入口指向线上服务。
+
+## 构建和验证
+
+服务端构建需要 Node.js 24+、pnpm 和 Python 3：
+
+```sh
+pnpm install --frozen-lockfile
+pnpm test
+pnpm build
+```
+
+8 项自动化检查覆盖时区与提醒、离线资源完整性、私密接口不缓存、身份和权限、跨设备编辑、冲突保护、历史恢复及请求来源校验。数据库测试使用 SQLite，生产使用 D1 的预编译查询。
+
+原有 `tests/browser.cjs` 保留为可选 Chromium 回归脚本，需要另行安装 Playwright；支持 `TEST_URL` 和 `BROWSER_PATH`。
 
 ## 项目结构
 
 ```text
-index.html          页面结构
-styles.css          桌面、手机、打印与无障碍样式
-itinerary.js        行程原始数据与路线节点
-app.js              日期逻辑、搜索筛选、核验、编辑、备份与日历
-assets/logo.jpg     优化后的品牌图片
-scripts/build.py    静态发布构建
-tests/             浏览器回归测试
-.openai/hosting.json 现有 Sites 项目配置
+index.html / styles.css          公开页面
+itinerary.js                    原始阶段和路线
+daily-plan.js                   已确认的当日活动、时区与酒店
+app.js                          原有搜索、核验与本机编辑
+features.js                     今日安排、提醒、分享与安装
+sw.js / manifest.webmanifest    公开行程离线缓存与安装
+shared.html / shared.js         私密协作界面
+server/worker.js                登录身份、授权和共享 API
+db/schema.ts / drizzle/         共享数据与不可变迁移
+scripts/build.py / vite.config.js  公开文件和 Worker 构建
+tests/                          自动化验证
 ```
 
-更新行程时编辑 `itinerary.js`。日期使用 `YYYY-MM-DD`，阶段保持时间顺序、首尾连续；`start` 同时作为核验记录的稳定标识，修改它会影响已有记录的匹配。`cities` 为独立维护的路线节点列表。
+`itinerary.js` 的 `start` 同时是核验及共享记录标识，修改日期需考虑已有数据。更新每日确切活动时同时更新 `daily-plan.js`；调整离线文件集合时修改 `sw.js` 缓存版本。
 
-## 构建与部署
+## 部署
 
-```sh
-python3 scripts/build.py
-python3 -m http.server 8000 --directory dist
-```
-
-构建结果位于 `dist/`，可托管在支持静态文件的网站服务。现有在线地址由 Sites 托管，`.openai/hosting.json` 绑定该项目。发布到 Sites 时，应从已提交并推送的同一份源代码构建、保存版本，再部署。向 GitHub 推送代码本身不会自动更新 Sites。
-
-## 验证
-
-`tests/browser.cjs` 使用 Playwright 检查：17 个阶段、日期边界、北京时间跨日、搜索及空状态、核验保存、损坏存储容错、展开状态、日历格式、旧版编辑迁移、备份合并与手机横向溢出。
-
-```sh
-npm install --no-save --package-lock=false playwright
-npx playwright install chromium
-# 在另一终端运行 python3 -m http.server 8000
-TEST_URL=http://localhost:8000 nodetests/browser.cjs
-```
-
-可通过 `BROWSER_PATH` 指定已安装的 Chrome 可执行文件。
-
-## 数据与兼容性
-
-支持现代 Chrome、Edge、Safari 和 Firefox；自动化回归在 Chromium 执行。清除浏览器数据、切换域名或使用无痕模式可能导致记录不可用，建议定期备份。存储失败时，页面会提示下载备份。
-
-保留原静态版存储键 `new-vision-itinerary-local-v1`；兼容已有在线助理版的 `new-vision-itinerary-state-v1`，读取其核验记录与编辑备注。应用没有后台数据库或共享编辑功能。
+- **GitHub Pages**：从 `main` 根目录发布公开文件。协作入口跳转到 Sites，不会在 GitHub Pages 运行服务端代码。
+- **Sites**：`pnpm build` 输出 `dist/client` 和 `dist/server/index.js`。`.openai/hosting.json` 绑定现有项目及逻辑数据库 `DB`。通过 Sites 保存并发布同一份已推送源代码构建的版本。
+- 在 Sites 环境中配置 `JOURNEY_OWNER_EMAIL`（所有者登录邮箱，标记为秘密值）与 `JOURNEY_ORIGIN`（线上 origin）。不将真实配置写入 Git。
+- 登录由 Sites 的 `/signin-with-chatgpt` 与 `/signout-with-chatgpt` 提供。Worker 信任平台验证并转发的身份头；不要把此 Worker 直接部署在允许外部伪造身份头的服务上。
+- 数据库变更使用 `pnpm db:generate` 生成迁移，保留已应用迁移，发布时由平台执行。
 
 ## English
 
-A lightweight itinerary dashboard for a 71-day journey, with Beijing-time progress, searchable stages, local verification, assistant notes, JSON backup/restore, calendar export, and print layouts. Run it with `python3 -m http.server 8000`; no frontend dependencies are required. The live Sites application is public and does not require sign-in. Browser records stay on the current device unless exported and restored.
+A 71-day travel dashboard with a focused Today view, time-zone-correct calendar reminders, private collaborative editing, version history and undo, and an installable offline public itinerary. Public pages require no sign-in. The shared workspace uses ChatGPT sign-in plus an owner-managed collaborator list and server-side persistence. Shared notes never appear in the public feed or offline cache. GitHub Pages hosts the public version; Sites hosts the authenticated collaboration service.

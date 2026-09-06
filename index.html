@@ -6,6 +6,8 @@
   <meta name="color-scheme" content="light">
   <meta name="description" content="徐远鹏先生七十一日行程：北京时间进度、城市路线、执行核验与日历导出。">
   <meta name="theme-color" content="#f4f2ed">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
   <title>徐远鹏先生｜七十一日行程</title>
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -22,6 +24,10 @@
     </div>
   </header>
   <main id="top" class="shell">
+    <section class="today-workspace" aria-labelledby="todayTitle">
+      <div class="section-head"><div><p class="kicker">今日随行</p><h1 id="todayTitle">今天的安排</h1></div><div class="day-picker"><label>查看日期<input type="date" id="planDate" min="2026-08-25" max="2026-11-03"></label><button class="button" id="returnToday">回到今天</button></div></div>
+      <div class="today-grid"><div><p class="today-city" id="planCity"></p><div id="dailyEvents"></div><div class="today-actions"><button class="button dark" id="dailyCalendar">添加日历提醒</button><a class="button" href="https://xuyuanpeng-71-day-journey.danyelxu.chatgpt.site/shared.html">进入协作空间 ↗</a></div><p class="small-note" id="reminderNote"></p></div><aside class="travel-card"><span class="kicker">住宿与转场</span><div id="travelInfo"></div></aside></div>
+    </section>
     <section class="hero">
       <div class="hero-copy"><p class="kicker">2026年8月25日—11月3日</p><h1>七十一日行程<br>核验进度</h1><p class="hero-subtitle">广州入境 · 广州离境 · 最终抵达多伦多</p><a class="journey-link" href="#timelineSection">查看完整行程 <span aria-hidden="true">↗</span></a></div>
       <div class="hero-metrics">
@@ -43,6 +49,7 @@
       <div class="section-head"><div><p class="kicker">完整路线</p><h2 class="section-title">十八个城市节点</h2></div><span class="section-note">沿途十八站 · 按行程顺序</span></div>
       <ol class="route" id="route"></ol>
     </section>
+    <section class="access-panel" aria-label="离线与分享"><div><strong id="connectionState">正在检查离线状态</strong><p id="lastUpdated">行程资料 · 2026-09-07</p></div><div class="backup-actions"><button class="button" id="installApp">安装到手机</button><button class="button" id="shareApp">分享行程</button><button class="button" id="refreshApp" hidden>更新离线版本</button></div></section>
     <section class="section" id="timelineSection">
       <div class="section-head"><div><p class="kicker">执行时间线</p><h2 class="section-title">十七个行程阶段</h2></div><div class="timeline-actions"><label class="search"><input aria-label="搜索行程" id="searchInput" type="search" placeholder="搜索城市、人物、公司或日期" autocomplete="off"><output id="resultCount" aria-live="polite">17 项</output></label><div class="controls"><button class="active" data-filter="all">全部</button><button data-filter="completed">已结束</button><button data-filter="verified">已核验</button><button data-filter="current">进行中</button><button data-filter="upcoming">未开始</button><button id="expandAll">全部展开</button><button id="collapseAll">全部收起</button></div></div></div>
       <div class="timeline-toolbar"><button class="button" id="jumpCurrent">定位当前阶段</button><span>按北京时间更新 · 点击阶段查看详情</span></div>
@@ -54,7 +61,10 @@
     <footer><div class="footer-left"><span>行程统筹及编排</span><b>郭璇 · 在华助理</b></div><p>时间进度按北京时间自动计算<br>计划日期结束不代表已核验完成</p></footer>
   </main>
   <dialog id="editor" aria-labelledby="editorTitle"><div class="dialog-head"><h2 id="editorTitle">助理编辑</h2><button class="button" id="closeEditor" aria-label="关闭编辑">关闭</button></div><p>调整只保存在此设备。日期显示的修改不会改变进度计算日期。</p><label>选择行程阶段<select id="editStage"></select></label><form id="editForm"><label>日期显示<input id="editDate" maxlength="200" required></label><label>城市／地点<input id="editCity" maxlength="200" required></label><label>核心安排<input id="editSummary" maxlength="1000" required></label><label>助理备注<textarea id="editNote" rows="4" maxlength="5000"></textarea></label><div class="backup-actions"><button type="submit" class="button dark">保存调整</button><button type="button" class="button" id="resetStage">恢复原始内容</button></div></form></dialog>
+  <dialog id="shareDialog" aria-labelledby="shareTitle"><div class="dialog-head"><h2 id="shareTitle">分享公开行程</h2><button class="button" id="closeShare">关闭</button></div><img class="share-qr" src="assets/share-qr.svg" width="220" height="220" alt="GitHub Pages 公开行程二维码"><p>扫码打开公开行程，不包含此设备的备注与核验记录。</p><a href="https://xudaniel.github.io/xuyuanpeng-71-day-journey/">GitHub 网页版</a><div class="backup-actions"><button class="button" id="copyShare">复制链接</button><button class="button" id="nativeShare">系统分享</button><a class="button" href="assets/share-qr.svg" download="journey-qr.svg">下载二维码</a></div><p id="shareMessage" role="status"></p></dialog>
+  <script src="daily-plan.js" defer></script>
   <script src="itinerary.js" defer></script>
   <script src="app.js" defer></script>
+  <script src="features.js" defer></script>
 </body>
 </html>
