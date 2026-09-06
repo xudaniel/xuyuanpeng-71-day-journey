@@ -4,7 +4,7 @@
 
 **[打开在线应用](https://xuyuanpeng-71-day-journey.danyelxu.chatgpt.site)** · [源代码](https://github.com/xudaniel/xuyuanpeng-71-day-journey)
 
-> 在线应用沿用现有的仅所有者访问设置，需要使用有权限的账号登录。核验记录与助理备注保存在当前浏览器，不会自动跨设备同步。
+> 在线应用已公开，任何人均可通过链接访问，无需登录。核验记录与助理备注保存在当前浏览器，不会自动跨设备同步。
 
 ## 功能
 
@@ -85,4 +85,4 @@ TEST_URL=http://localhost:8000 nodetests/browser.cjs
 
 ## English
 
-A lightweight itinerary dashboard for a 71-day journey, with Beijing-time progress, searchable stages, local verification, assistant notes, JSON backup/restore, calendar export, and print layouts. Run it with `python3 -m http.server 8000`; no frontend dependencies are required. The live Sites application requires an authorized account. Browser records stay on the current device unless exported and restored.
+A lightweight itinerary dashboard for a 71-day journey, with Beijing-time progress, searchable stages, local verification, assistant notes, JSON backup/restore, calendar export, and print layouts. Run it with `python3 -m http.server 8000`; no frontend dependencies are required. The live Sites application is public and does not require sign-in. Browser records stay on the current device unless exported and restored.
