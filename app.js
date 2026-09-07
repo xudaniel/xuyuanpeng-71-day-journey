@@ -15,7 +15,7 @@ const fmt = date => new Intl.DateTimeFormat('zh-CN', {timeZone:'UTC',year:'numer
 const assistantKey = 'new-vision-itinerary-state-v1';
 const defaults = itinerary.map(x=>({...x,details:[...x.details]}));
 let overrides = {};
-const validKeys = new Set(itinerary.map(x => x.start));
+const validKeys = new Set(itinerary.map(stageKey));
 function sanitizeVerified(value) {
   return Array.isArray(value) ? [...new Set(value.filter(x => typeof x === 'string' && validKeys.has(x)))] : [];
 }
@@ -23,6 +23,7 @@ function announce(message) { $('storageNotice').textContent = message; }
 function readVerified() {
   try {
     const old = JSON.parse(localStorage.getItem(assistantKey) || '{}');
+    if(old?.overrides?.['2026-10-25'] && !localStorage.getItem('journey-archive-before-20260908')) localStorage.setItem('journey-archive-before-20260908',JSON.stringify({assistant:old,verified:localStorage.getItem(storeKey)}));
     overrides = sanitizeOverrides(old?.overrides);
     applyOverrides();
     const saved = localStorage.getItem(storeKey);
@@ -40,7 +41,7 @@ function sanitizeOverrides(value) {
   return clean;
 }
 function applyOverrides(){
-  defaults.forEach((base,i)=>{const o=overrides[base.start]||{};itinerary[i]={...base,date:o.dateLabel??base.date,city:o.city??base.city,summary:o.summary??base.summary,details:o.note?[...base.details,'助理备注：'+o.note]:[...base.details]};});
+  defaults.forEach((base,i)=>{const o=currentStageData(base,overrides[stageKey(base)])||{};itinerary[i]={...base,date:o.dateLabel??base.date,city:o.city??base.city,summary:o.summary??base.summary,details:o.note?[...base.details,'助理备注：'+o.note]:[...base.details]};});
 }
 function saveVerified() {
   try { localStorage.setItem(storeKey, JSON.stringify([...verified])); localStorage.setItem(assistantKey,JSON.stringify({completed:[...verified],overrides})); return true; }
@@ -83,13 +84,13 @@ function render() {
   $('route').innerHTML = cities.map((c,i) => `<li><b>${String(i+1).padStart(2,'0')}</b>${escapeHTML(c)}</li>`).join('');
   let shown = 0;
   $('timeline').innerHTML = itinerary.map((x,i) => {
-    const st = statusOf(x,today), isV = verified.has(x.start);
+    const st = statusOf(x,today), isV = verified.has(stageKey(x));
     if (!(filter === 'all' || filter === 'verified' && isV || filter === st)) return '';
     if (query && ![x.start,x.end,x.date,x.city,x.eyebrow,x.summary,...x.details].join(' ').toLowerCase().includes(query)) return '';
     shown++;
-    const open = expanded.get(x.start) ?? st === 'current';
+    const open = expanded.get(stageKey(x)) ?? st === 'current';
     const label = st === 'completed' ? '已结束' : st === 'current' ? '进行中' : '未开始';
-    return `<article id="stage-${i}" class="row ${st} ${isV?'verified':''} ${open?'open':''}"><div class="marker"><span>${isV?'✓':String(i+1).padStart(2,'0')}</span></div><button class="main" type="button" data-start="${x.start}" aria-expanded="${open}" aria-controls="details-${i}"><span class="date">${escapeHTML(x.date)}</span><span class="place"><small>${escapeHTML(x.eyebrow)}</small><span class="place-title">${escapeHTML(x.city)}</span></span><span class="summary">${escapeHTML(x.summary)}</span><span class="badge">${label}${isV?' · 已核验':''}</span><span class="chevron" aria-hidden="true">⌄</span></button><div class="details" id="details-${i}"><div class="details-inner"><ul>${x.details.map(d=>`<li>${escapeHTML(d)}</li>`).join('')}</ul><label class="verify"><input type="checkbox" data-start="${x.start}" ${isV?'checked':''}> 标记为已核验完成</label></div></div></article>`;
+    return `<article id="stage-${i}" class="row ${st} ${isV?'verified':''} ${open?'open':''}"><div class="marker"><span>${isV?'✓':String(i+1).padStart(2,'0')}</span></div><button class="main" type="button" data-start="${stageKey(x)}" aria-expanded="${open}" aria-controls="details-${i}"><span class="date">${escapeHTML(x.date)}</span><span class="place"><small>${escapeHTML(x.eyebrow)}</small><span class="place-title">${escapeHTML(x.city)}</span></span><span class="summary">${escapeHTML(x.summary)}</span><span class="badge">${label}${isV?' · 已核验':''}</span><span class="chevron" aria-hidden="true">⌄</span></button><div class="details" id="details-${i}"><div class="details-inner"><ul>${x.details.map(d=>`<li>${escapeHTML(d)}</li>`).join('')}</ul><label class="verify"><input type="checkbox" data-start="${stageKey(x)}" ${isV?'checked':''}> 标记为已核验完成</label></div></div></article>`;
   }).join('');
   $('resultCount').textContent = `${shown} / ${itinerary.length} 项`;
   $('emptyState').hidden = shown !== 0;
@@ -132,7 +133,7 @@ function foldLine(line) {
 function calendarContent() {
   const stamp=new Date().toISOString().replaceAll('-','').replaceAll(':','').replace(/\.\d{3}Z$/,'Z');
   const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//New Vision Investment//71 Day Journey//ZH','CALSCALE:GREGORIAN','METHOD:PUBLISH'];
-  itinerary.forEach(x=>lines.push('BEGIN:VEVENT',`UID:${x.start}@newvision.travel`,`DTSTAMP:${stamp}`,`DTSTART;VALUE=DATE:${x.start.replaceAll('-','')}`,`DTEND;VALUE=DATE:${addDay(x.end)}`,`SUMMARY:${icsEscape(`${x.city} · ${x.summary}`)}`,`LOCATION:${icsEscape(x.city)}`,`DESCRIPTION:${icsEscape(x.details.join('\n'))}`,'END:VEVENT'));
+  itinerary.forEach(x=>lines.push('BEGIN:VEVENT',`UID:${stageKey(x)}@newvision.travel`,`DTSTAMP:${stamp}`,`DTSTART;VALUE=DATE:${x.start.replaceAll('-','')}`,`DTEND;VALUE=DATE:${addDay(x.end)}`,`SUMMARY:${icsEscape(`${x.city} · ${x.summary}`)}`,`LOCATION:${icsEscape(x.city)}`,`DESCRIPTION:${icsEscape(x.details.join('\n'))}`,'END:VEVENT'));
   lines.push('END:VCALENDAR');return lines.map(foldLine).join('\r\n')+'\r\n';
 }
 document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{filter=b.dataset.filter;render();});
@@ -152,7 +153,7 @@ $('backupFile').onchange=async e=>{
   try {
     if(file.size>100000)throw new Error('文件过大');
     const data=JSON.parse(await file.text());
-    if(data.version!==1 || data.journey!=='xuyuanpeng-71-day-journey' || !Array.isArray(data.verified) || data.verified.some(x=>!validKeys.has(x)))throw new Error('格式不匹配');
+    if(data.version!==1 || data.journey!=='xuyuanpeng-71-day-journey' || !Array.isArray(data.verified) || data.verified.some(x=>!validKeys.has(x)&&x!=='2026-10-25'))throw new Error('格式不匹配');
     sanitizeVerified(data.verified).forEach(key=>verified.add(key));
     overrides={...sanitizeOverrides(data.overrides),...overrides};applyOverrides();
     if(saveVerified())announce('备份已合并到当前进度，原有核验记录已保留。');
@@ -167,7 +168,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshDat
 render();
 
 function fillEditor(){
-  const base=defaults[Number($('editStage').value)],o=overrides[base.start]||{};
+  const base=defaults[Number($('editStage').value)],o=currentStageData(base,overrides[stageKey(base)])||{};
   $('editDate').value=o.dateLabel??base.date;$('editCity').value=o.city??base.city;$('editSummary').value=o.summary??base.summary;$('editNote').value=o.note??'';
 }
 $('editStage').innerHTML=defaults.map((x,i)=>`<option value="${i}">${i+1} · ${escapeHTML(x.date)} · ${escapeHTML(x.city)}</option>`).join('');
@@ -175,8 +176,8 @@ $('editStage').onchange=fillEditor;
 $('openEditor').onclick=()=>{const i=journeyState(shanghaiToday()).current;$('editStage').value=String(Math.max(0,i));fillEditor();$('editor').showModal();};
 $('closeEditor').onclick=()=>$('editor').close();
 $('editForm').onsubmit=e=>{
-  e.preventDefault();const key=defaults[Number($('editStage').value)].start;
+  e.preventDefault();const key=stageKey(defaults[Number($('editStage').value)]);
   overrides[key]={dateLabel:$('editDate').value,city:$('editCity').value,summary:$('editSummary').value,note:$('editNote').value};applyOverrides();
   if(saveVerified())announce('行程调整已保存到此设备。');render();$('editor').close();
 };
-$('resetStage').onclick=()=>{delete overrides[defaults[Number($('editStage').value)].start];applyOverrides();if(saveVerified())announce('本阶段内容已恢复为原始安排。');fillEditor();render();};
+$('resetStage').onclick=()=>{delete overrides[stageKey(defaults[Number($('editStage').value)])];applyOverrides();if(saveVerified())announce('本阶段内容已恢复为原始安排。');fillEditor();render();};

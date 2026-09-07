@@ -42,7 +42,7 @@ $('installApp').onclick=async()=>{if(installPrompt){await installPrompt.prompt()
 async function connectionStatus(){
  const available='caches' in window && await caches.has('journey-public-v2');
  $('connectionState').textContent=navigator.onLine?(available?'公开行程已可离线查看':'在线 · 正在准备离线行程'):(available?'离线 · 显示已保存的公开行程':'离线 · 尚未保存完整行程');
- $('lastUpdated').textContent='行程资料更新：2026-09-07 · 协作内容需联网登录';
+ $('lastUpdated').textContent='行程资料更新：2026-09-08 · 协作内容需联网登录';
 }
 window.addEventListener('online',connectionStatus);window.addEventListener('offline',connectionStatus);
 $('refreshApp').onclick=()=>{if(swRegistration?.waiting)swRegistration.waiting.postMessage({type:'ACTIVATE_UPDATE'});};
