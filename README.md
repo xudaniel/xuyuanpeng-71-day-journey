@@ -9,7 +9,7 @@
 | 手机安全分享版 | `index.html` | 日常查看、对外转发 | 仅展示概览与脱敏内容 |
 | 加密完整版 | `private.html` | 本人及授权人员使用 | 输入访问密码后，在浏览器本地解密完整行程 |
 
-合并并完成 GitHub Pages 部署后：
+当前 GitHub Pages 入口：
 
 - 公开入口：<https://xudaniel.github.io/xuyuanpeng-71-day-journey/>
 - 完整版入口：<https://xudaniel.github.io/xuyuanpeng-71-day-journey/private.html>
@@ -47,6 +47,6 @@
 
 ## 重要限制
 
-本项目的密码页属于浏览器端加密访问，不等同于服务器账户系统。公开 GitHub 仓库的历史提交仍可能保留过去发布过的内容；如需彻底移除旧敏感资料，必须另行清理 Git 历史及相关缓存。
+本项目的密码页属于浏览器端加密访问，不等同于服务器账户系统。公开 GitHub 仓库的历史提交仍可能保留过去发布过的内容；如需彻底移除旧敏感资料，必须另行清理 Git 历史、旧部署及相关缓存。
 
-当前变更仅通过草稿 PR 提供审阅，不会自动合并或修改线上版本。
+当前安全版本已通过 PR #2 合并至 `main`，并由 GitHub Pages 发布。
