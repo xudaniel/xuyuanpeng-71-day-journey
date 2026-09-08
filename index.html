@@ -4,67 +4,341 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="light">
-  <meta name="description" content="徐远鹏先生七十一日行程：北京时间进度、城市路线、执行核验与日历导出。">
-  <meta name="theme-color" content="#f4f2ed">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="apple-touch-icon" href="assets/icon-192.png">
-  <title>徐远鹏先生｜七十一日行程</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>徐远鹏先生｜七十一日行程｜安全分享版</title>
+  <style>
+    :root{--ink:#161615;--paper:#f4f2ed;--white:#fcfbf8;--line:#d4d0c7;--muted:#6d6a64;--soft:#e8e5df}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,"SF Pro Display","Helvetica Neue","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}.shell{width:min(1160px,calc(100% - 64px));margin:auto}
+    header{position:sticky;top:0;z-index:10;border-bottom:1px solid var(--line);background:rgba(244,242,237,.95);backdrop-filter:blur(16px)}.header-inner{height:78px;display:flex;align-items:center;justify-content:space-between}.brand{display:flex;align-items:center;gap:17px;text-decoration:none;color:inherit}.logo-crop{position:relative;display:block;width:180px;height:50px;overflow:hidden}.logo-crop img{position:absolute;display:block;width:153%;max-width:none;height:auto;left:-26.6%;top:-154%;mix-blend-mode:multiply}.brand-rule{width:1px;height:30px;background:var(--line)}.brand-copy{display:grid;gap:3px}.brand-copy b{font-family:"Songti SC",STSong,SimSun,serif;font-size:15px;letter-spacing:.08em}.brand-copy span{color:var(--muted);font-size:9px;letter-spacing:.18em}.header-tools{display:flex;align-items:center;gap:16px}.today{font-size:11px;letter-spacing:.04em}.button{border:1px solid var(--ink);background:transparent;color:var(--ink);padding:9px 13px;cursor:pointer;font:inherit;font-size:10px;letter-spacing:.08em}.button.dark{background:var(--ink);color:var(--white)}
+    .hero{display:grid;grid-template-columns:1.1fr 1fr;border-bottom:1px solid var(--ink)}.hero-copy{padding:74px 48px 68px 0}.kicker{margin:0 0 16px;color:var(--muted);font-size:10px;font-weight:600;letter-spacing:.2em}.hero h1,.section-title{font-family:"Songti SC",STSong,SimSun,serif;font-weight:600}.hero h1{margin:0;font-size:clamp(44px,5.3vw,68px);line-height:1.03;letter-spacing:-.05em}.hero-subtitle{margin:25px 0 0;color:var(--muted);font-size:12px;letter-spacing:.06em}.hero-metrics{border-left:1px solid var(--line);padding:58px 0 58px 52px;display:grid;grid-template-columns:1fr 1fr;gap:30px}.metric-label{color:var(--muted);font-size:9px;letter-spacing:.16em}.metric-value{display:flex;align-items:baseline;gap:6px;margin-top:10px;font-size:42px;font-weight:450;letter-spacing:-.06em}.metric-value small{font-size:11px;letter-spacing:0}.bar{grid-column:1/-1;height:4px;background:var(--soft);overflow:hidden}.bar>i{display:block;width:0;height:100%;background:var(--ink);transition:width .35s}.hero-current{grid-column:1/-1;border-top:1px solid var(--line);padding-top:27px}.hero-current .city{font-family:"Songti SC",STSong,SimSun,serif;font-size:29px}.hero-current h2{margin:9px 0 7px;font-family:"Songti SC",STSong,SimSun,serif;font-size:19px}.hero-current p{margin:0;color:var(--muted);font-size:11px;line-height:1.7}
+    .status{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line)}.status>div{min-height:108px;padding:25px 26px;border-right:1px solid var(--line);display:grid;align-content:center}.status>div:first-child{padding-left:0}.status>div:last-child{border:0}.status span{color:var(--muted);font-size:9px;letter-spacing:.14em}.status strong{margin-top:9px;font-size:24px;font-weight:500}.status small{font-size:10px;font-weight:400;color:var(--muted)}
+    .briefing{margin-top:28px;display:grid;grid-template-columns:1.25fr 1fr 1fr;background:var(--ink);color:var(--white)}.briefing>div{min-height:148px;padding:25px 27px;border-right:1px solid #454440;display:flex;flex-direction:column;justify-content:center}.briefing>div:last-child{border:0}.briefing span{color:#aaa7a0;font-size:8px;letter-spacing:.16em}.briefing strong{margin-top:12px;font-family:"Songti SC",STSong,SimSun,serif;font-size:20px;font-weight:500;line-height:1.35}.briefing p{margin:9px 0 0;color:#bbb8b0;font-size:10px;line-height:1.65}
+    .section{padding-top:72px}.section-head{display:flex;justify-content:space-between;align-items:end;padding-bottom:21px;border-bottom:1px solid var(--ink)}.section-head .kicker{margin-bottom:10px}.section-title{margin:0;font-size:31px}.section-note{color:var(--muted);font-size:9px;letter-spacing:.1em}.route{display:flex;flex-wrap:wrap;gap:12px 5px;margin:0;padding:26px 0 0;list-style:none}.route li{font-family:"Songti SC",STSong,SimSun,serif;font-size:13px;color:#46433f}.route b{margin-right:6px;color:#9a968d;font-family:Inter,sans-serif;font-size:8px;letter-spacing:.08em}.route em{margin-left:7px;color:#aaa69e;font-family:Inter,sans-serif;font-size:11px;font-style:normal}
+    .timeline-actions{display:grid;justify-items:end;gap:12px}.search{width:min(360px,100%);height:38px;display:flex;align-items:center;border-bottom:1px solid var(--ink)}.search input{min-width:0;flex:1;border:0;outline:0;background:transparent;color:var(--ink);font:inherit;font-size:11px}.search input::placeholder{color:#9a968d}.search output{color:var(--muted);font-size:8px;white-space:nowrap}.controls{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px}.controls button{border:1px solid transparent;background:transparent;padding:8px 11px;color:var(--muted);cursor:pointer;font:inherit;font-size:9px;letter-spacing:.06em}.controls button.active{border-color:var(--ink);background:var(--white);color:var(--ink)}
+    .timeline{border-bottom:1px solid var(--ink)}.row{display:grid;grid-template-columns:49px 1fr;border-bottom:1px solid var(--line)}.row:last-child{border-bottom:0}.marker{position:relative;padding-top:27px}.marker:after{content:"";position:absolute;top:49px;bottom:-1px;left:12px;width:1px;background:var(--line)}.row:last-child .marker:after{display:none}.marker span{position:relative;z-index:1;display:grid;place-items:center;width:25px;height:25px;border:1px solid var(--line);border-radius:50%;background:var(--paper);color:var(--muted);font-size:8px}.row.current .marker span{border:5px solid var(--ink);color:transparent}.row.verified .marker span{border-color:var(--ink);background:var(--ink);color:white}.main{width:100%;min-height:86px;display:grid;grid-template-columns:166px 1fr 1.25fr 73px 17px;gap:17px;align-items:center;padding:20px 0;border:0;background:transparent;text-align:left;color:inherit;cursor:pointer;font:inherit}.date{color:var(--muted);font-size:10px}.place small{display:block;color:var(--muted);font-size:8px;letter-spacing:.13em}.place h3{margin:4px 0 0;font-family:"Songti SC",STSong,SimSun,serif;font-size:18px}.summary{margin:0;color:var(--muted);font-size:11px;line-height:1.55}.badge{justify-self:start;border:1px solid var(--line);padding:5px 7px;color:var(--muted);font-size:8px;letter-spacing:.06em;white-space:nowrap}.row.current .badge,.row.verified .badge{border-color:var(--ink);background:var(--ink);color:white}.chevron{font-size:15px;transition:transform .2s}.row.open .chevron{transform:rotate(180deg)}.details{display:none;grid-column:2;padding:0 0 25px 183px}.row.open .details{display:block}.details-inner{padding:18px 21px;border-left:1px solid var(--ink);background:rgba(255,255,255,.42)}.details ul{margin:0;padding:0 0 0 18px}.details li{margin:6px 0;color:#4f4c47;font-size:10px;line-height:1.65}.verify{display:flex;align-items:center;gap:7px;margin-top:15px;padding-top:13px;border-top:1px solid var(--line);color:var(--muted);font-size:9px}.verify input{accent-color:var(--ink)}
+    footer{margin-top:86px;padding:27px 0 40px;border-top:1px solid var(--ink);display:flex;justify-content:space-between}.footer-left{display:grid;gap:6px}.footer-left span,footer p{margin:0;color:var(--muted);font-size:8px;letter-spacing:.13em}.footer-left b{font-family:"Songti SC",STSong,SimSun,serif;font-size:13px}
+    .today-view{padding:42px 0 0}.today-card{border:1px solid var(--ink);background:var(--white)}.today-card-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--line)}.today-card-head span{font-size:13px;color:var(--muted);letter-spacing:.08em}.mode-pill{display:inline-flex;align-items:center;min-height:32px;padding:6px 10px;border:1px solid var(--ink);font-size:12px;color:var(--ink)}.today-body{display:grid;grid-template-columns:1fr .86fr}.today-primary{padding:34px 36px 32px;border-right:1px solid var(--line)}.today-date{margin:0 0 12px;color:var(--muted);font-size:14px}.today-place{margin:0;font-family:"Songti SC",STSong,SimSun,serif;font-size:clamp(38px,6vw,66px);line-height:1}.today-summary{margin:18px 0 0;font-family:"Songti SC",STSong,SimSun,serif;font-size:24px;line-height:1.45}.today-progress{margin-top:28px}.today-progress-meta{display:flex;justify-content:space-between;margin-bottom:10px;color:var(--muted);font-size:13px}.today-list-wrap{padding:34px 34px 30px}.today-list-title{margin:0 0 16px;color:var(--muted);font-size:13px;letter-spacing:.1em}.today-list{margin:0;padding:0;list-style:none}.today-list li{position:relative;padding:0 0 13px 19px;font-size:16px;line-height:1.65}.today-list li:before{content:"";position:absolute;left:0;top:.7em;width:6px;height:6px;border-radius:50%;background:var(--ink)}.today-next{margin-top:24px;padding-top:20px;border-top:1px solid var(--line)}.today-next span{display:block;color:var(--muted);font-size:12px;letter-spacing:.08em}.today-next strong{display:block;margin-top:8px;font-family:"Songti SC",STSong,SimSun,serif;font-size:19px;font-weight:500;line-height:1.45}.today-actions{display:flex;flex-wrap:wrap;gap:9px;padding:18px 22px;border-top:1px solid var(--line)}.action{min-height:44px;padding:10px 15px;border:1px solid var(--ink);background:transparent;color:var(--ink);font:inherit;font-size:14px;cursor:pointer}.action.primary{margin-left:auto;background:var(--ink);color:var(--white)}.action:disabled{opacity:.35;cursor:not-allowed}.swipe-hint{display:none;margin:14px 0 0;text-align:center;color:var(--muted);font-size:12px}.bottom-nav{display:none}[data-view="today"] .full-view{display:none}[data-view="all"] .today-view{display:none}.safe-note{display:none}.safe-mode .safe-note{display:block;margin:14px 0 0;color:var(--muted);font-size:12px;line-height:1.6}
+    @media(max-width:820px){.shell{width:min(100% - 38px,680px)}.brand-copy{display:none}.hero{display:block}.hero-copy{padding:54px 0}.hero-metrics{border-left:0;border-top:1px solid var(--line);padding:42px 0}.status{grid-template-columns:1fr 1fr}.status>div{border-bottom:1px solid var(--line)}.status>div:nth-child(2){border-right:0}.status>div:nth-child(3){padding-left:0;border-bottom:0}.briefing{grid-template-columns:1fr}.briefing>div{min-height:0;border-right:0;border-bottom:1px solid #454440}.main{grid-template-columns:130px 1fr 70px 17px}.summary{display:none}.details{padding-left:147px}.today-body{grid-template-columns:1fr}.today-primary{border-right:0;border-bottom:1px solid var(--line)}}
+    @media(max-width:560px){body{padding-bottom:76px;font-size:16px}.shell{width:calc(100% - 28px)}.header-inner{height:68px}.logo-crop{width:132px;height:38px}.brand-rule,.today,#exportCalendar,.print-button{display:none}.header-tools{gap:6px}.button{min-height:44px;padding:9px 11px;font-size:13px}.today-view{padding-top:18px}.today-card-head{padding:14px 16px}.today-card-head span{font-size:13px}.mode-pill{font-size:12px}.today-primary,.today-list-wrap{padding:25px 20px 23px}.today-date{font-size:14px}.today-place{font-size:44px}.today-summary{font-size:22px}.today-progress-meta{font-size:13px}.today-list-title{font-size:13px}.today-list li{padding-left:20px;font-size:16px;line-height:1.7}.today-next span{font-size:13px}.today-next strong{font-size:19px}.today-actions{padding:14px 16px;display:grid;grid-template-columns:1fr 1fr}.action{width:100%;min-height:48px;font-size:15px}.action.primary{grid-column:1/-1;margin:0}.swipe-hint{display:block}.hero-copy{padding:34px 0}.hero h1{font-size:39px}.hero-subtitle{font-size:15px;line-height:1.6}.kicker{font-size:12px}.hero-metrics{padding:28px 0;gap:22px}.metric-label{font-size:12px}.metric-value{font-size:36px}.hero-current .city{font-size:31px}.hero-current h2{font-size:21px}.hero-current p{font-size:16px}.status>div{min-height:102px;padding:20px 13px}.status>div:first-child,.status>div:nth-child(3){padding-left:0}.status span{font-size:12px}.status strong{font-size:22px}.status small{font-size:13px}.briefing{margin-top:20px}.briefing>div{padding:22px}.briefing span{font-size:12px}.briefing strong{font-size:21px}.briefing p{font-size:15px}.section{padding-top:52px}.section-head{display:block}.section-note{display:block;margin-top:10px;font-size:12px}.section-title{font-size:30px}.route{gap:15px 7px}.route li{font-size:16px}.route b{font-size:12px}.timeline-actions{display:block}.search{margin-top:22px;width:100%;height:48px}.search input{font-size:16px}.search output{font-size:12px}.controls{justify-content:flex-start;margin-top:12px;overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px}.controls button{min-height:44px;padding:10px 13px;font-size:14px;white-space:nowrap}.row{grid-template-columns:38px 1fr}.marker{padding-top:23px}.marker:after{top:48px;left:12px}.marker span{width:25px;height:25px;font-size:11px}.main{grid-template-columns:1fr 76px 18px;gap:8px 10px;min-height:112px;padding:20px 0}.date{grid-column:1/-1;font-size:14px}.place{grid-column:1}.place small{font-size:12px}.place h3{font-size:21px}.badge{grid-column:2;padding:7px 8px;font-size:12px}.chevron{grid-column:3}.details{padding:0 0 23px}.details-inner{padding:18px}.details li{font-size:16px;line-height:1.7}.verify{min-height:44px;font-size:14px}.bottom-nav{position:fixed;z-index:20;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(4,1fr);padding:8px max(10px,env(safe-area-inset-left)) calc(8px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:rgba(252,251,248,.97);backdrop-filter:blur(18px)}.bottom-nav button{min-height:48px;border:0;background:transparent;color:var(--muted);font:inherit;font-size:13px}.bottom-nav button.active{color:var(--ink);font-weight:650}.bottom-nav button span{display:block;margin-bottom:3px;font-size:17px}footer{margin-top:60px;gap:20px}footer p{max-width:150px;text-align:right;font-size:12px;line-height:1.55}.footer-left span{font-size:12px}.footer-left b{font-size:15px}}
+    @media print{header,.bottom-nav,.today-actions,.controls,.search,.verify,.swipe-hint{display:none!important}.shell{width:100%}.hero-copy{padding-top:45px}.section{padding-top:44px}.row{break-inside:avoid}.row .details{display:block}.details{padding-bottom:18px}footer{margin-top:45px}@page{margin:15mm}}
+  .login-link{text-decoration:none;display:inline-flex;align-items:center;justify-content:center}@media(max-width:560px){#privacyToggle{display:none}.login-link{min-height:44px;font-size:13px}}</style>
 </head>
 <body>
-  <a class="skip-link" href="#timelineSection">跳转至执行时间线</a>
-  <noscript><p class="notice">请启用 JavaScript 以查看行程与执行进度。</p></noscript>
   <header>
     <div class="shell header-inner">
       <a class="brand" href="#top" aria-label="返回顶部">
         <span class="logo-crop"><img alt="欣远景投资" src="assets/logo.jpg"></span>
-        <span class="brand-rule"></span><span class="brand-copy"><b>徐远鹏先生</b><span>七十一日行程 · 2026</span></span>
+        <span class="brand-rule"></span><span class="brand-copy"><b>徐远鹏先生</b><span>七十一日行程 · 安全分享版</span></span>
       </a>
-      <div class="header-tools"><span class="today" id="todayHeader"></span><button class="button" id="exportCalendar">导出日历</button><button class="button dark" onclick="window.print()">打印 / 存 PDF</button></div>
+      <div class="header-tools"><span class="today" id="todayHeader"></span><button class="button" id="privacyToggle" type="button" aria-pressed="false">完整内部版</button><a class="button login-link" href="private.html">完整版登录</a><button class="button" id="exportCalendar" type="button">导出日历</button><button class="button dark print-button" type="button" onclick="window.print()">打印 / 存 PDF</button></div>
     </div>
   </header>
-  <main id="top" class="shell">
-    <section class="today-workspace" aria-labelledby="todayTitle">
-      <div class="section-head"><div><p class="kicker">今日随行</p><h1 id="todayTitle">今天的安排</h1></div><div class="day-picker"><label>查看日期<input type="date" id="planDate" min="2026-08-25" max="2026-11-03"></label><button class="button" id="returnToday">回到今天</button></div></div>
-      <div class="today-grid"><div><p class="today-city" id="planCity"></p><div id="dailyEvents"></div><div class="today-actions"><button class="button dark" id="dailyCalendar">添加日历提醒</button><a class="button" href="https://xuyuanpeng-71-day-journey.danyelxu.chatgpt.site/shared.html">进入协作空间 ↗</a></div><p class="small-note" id="reminderNote"></p></div><aside class="travel-card"><span class="kicker">住宿与转场</span><div id="travelInfo"></div></aside></div>
+  <main id="top" class="shell" data-view="today">
+    <section class="today-view" id="todayView" aria-label="今日执行">
+      <article class="today-card">
+        <div class="today-card-head"><span>今日执行 · 北京时间</span><b class="mode-pill" id="privacyState">完整内部版</b></div>
+        <div class="today-body">
+          <div class="today-primary">
+            <p class="today-date" id="todayDate">—</p>
+            <h1 class="today-place" id="todayPlace">—</h1>
+            <p class="today-summary" id="todaySummary">—</p>
+            <div class="today-progress"><div class="today-progress-meta"><span id="todayProgressText">—</span><span id="todayStageText">—</span></div><div class="bar"><i id="todayProgressBar"></i></div></div>
+            <p class="safe-note">当前为安全展示模式：住宿、交通班次、联系方式及家庭细节已隐藏。</p>
+          </div>
+          <div class="today-list-wrap">
+            <p class="today-list-title">本阶段执行事项</p>
+            <ul class="today-list" id="todayTasks"></ul>
+            <div class="today-next"><span>下一阶段</span><strong id="todayNext">—</strong></div>
+          </div>
+        </div>
+        <div class="today-actions"><button class="action" id="todayPrev" type="button">← 上一阶段</button><button class="action" id="todayNextButton" type="button">下一阶段 →</button><button class="action" id="todayVerify" type="button">标记本阶段已核验</button><button class="action primary" id="showAll" type="button">查看完整71天行程</button></div>
+      </article>
+      <p class="swipe-hint">在卡片上左右滑动，可切换行程阶段</p>
     </section>
-    <section class="hero">
-      <div class="hero-copy"><p class="kicker">2026年8月25日—11月3日</p><h1>七十一日行程<br>核验进度</h1><p class="hero-subtitle">广州入境 · 广州离境 · 最终抵达多伦多</p><a class="journey-link" href="#timelineSection">查看完整行程 <span aria-hidden="true">↗</span></a></div>
+    <section class="hero full-view">
+      <div class="hero-copy"><p class="kicker">2026年8月25日—11月3日</p><h1>七十一日行程<br>执行进度</h1><p class="hero-subtitle">广州入境 · 广州离境 · 最终抵达多伦多</p></div>
       <div class="hero-metrics">
         <div><span class="metric-label">时间进度</span><div class="metric-value"><span id="timePct">0</span><small>%</small></div></div>
-        <div><span class="metric-label">核验进度</span><div class="metric-value"><span id="executionPct">0</span><small>%</small></div></div>
-        <div class="bar" role="progressbar" aria-label="时间进度" aria-valuemin="0" aria-valuemax="100"><i id="progressBar"></i></div>
-        <div class="hero-current"><span class="metric-label">当前计划</span><div class="city" id="currentCity">—</div><h2 id="currentSummary">—</h2><p id="currentDetail">—</p></div>
+        <div><span class="metric-label">执行进度</span><div class="metric-value"><span id="executionPct">0</span><small>%</small></div></div>
+        <div class="bar"><i id="progressBar"></i></div>
+        <div class="hero-current"><span class="metric-label">当前所在</span><div class="city" id="currentCity">—</div><h2 id="currentSummary">—</h2><p id="currentDetail">—</p></div>
       </div>
     </section>
-    <section class="status" aria-label="行程状态摘要">
+    <section class="status full-view" aria-label="行程状态摘要">
       <div><span>今日</span><strong id="todayLabel">—</strong></div><div><span>行程日</span><strong>第 <b id="dayNo">—</b> <small>／71天</small></strong></div><div><span>今日后剩余</span><strong><b id="remaining">—</b> <small>天</small></strong></div><div><span>下一程</span><strong id="nextMove">—</strong><small id="nextDate"></small></div>
     </section>
-    <section class="briefing" aria-label="秘书执行提示">
+    <section class="briefing full-view" aria-label="秘书执行提示">
       <div><span>今日重点</span><strong id="briefFocus">—</strong><p id="briefDetail">—</p></div>
       <div><span>当前阶段</span><strong id="stageRemaining">—</strong><p id="stageWindow">—</p></div>
       <div><span>下一转场</span><strong id="nextCountdown">—</strong><p id="nextBrief">—</p></div>
     </section>
-    <section class="section">
-      <div class="section-head"><div><p class="kicker">完整路线</p><h2 class="section-title">十八个城市节点</h2></div><span class="section-note">沿途十八站 · 按行程顺序</span></div>
+    <section class="section full-view">
+      <div class="section-head"><div><p class="kicker">完整路线</p><h2 class="section-title">十八个城市节点</h2></div><span class="section-note">只列城市 · 快速总览</span></div>
       <ol class="route" id="route"></ol>
     </section>
-    <section class="access-panel" aria-label="离线与分享"><div><strong id="connectionState">正在检查离线状态</strong><p id="lastUpdated">行程资料 · 2026-09-08</p></div><div class="backup-actions"><button class="button" id="installApp">安装到手机</button><button class="button" id="shareApp">分享行程</button><button class="button" id="refreshApp" hidden>更新离线版本</button></div></section>
-    <section class="section" id="timelineSection">
-      <div class="section-head"><div><p class="kicker">执行时间线</p><h2 class="section-title">十六个行程阶段</h2></div><div class="timeline-actions"><label class="search"><input aria-label="搜索行程" id="searchInput" type="search" placeholder="搜索城市、人物、公司或日期" autocomplete="off"><output id="resultCount" aria-live="polite">16 项</output></label><div class="controls"><button class="active" data-filter="all">全部</button><button data-filter="completed">已结束</button><button data-filter="verified">已核验</button><button data-filter="current">进行中</button><button data-filter="upcoming">未开始</button><button id="expandAll">全部展开</button><button id="collapseAll">全部收起</button></div></div></div>
-      <div class="timeline-toolbar"><button class="button" id="jumpCurrent">定位当前阶段</button><span>按北京时间更新 · 点击阶段查看详情</span></div>
+    <section class="section full-view" id="timelineSection">
+      <div class="section-head"><div><p class="kicker">执行时间线</p><h2 class="section-title">十六个行程阶段</h2></div><div class="timeline-actions"><label class="search"><input id="searchInput" type="search" placeholder="搜索城市、人物、公司或日期" autocomplete="off"><output id="resultCount">16 项</output></label><div class="controls"><button class="active" data-filter="all">全部</button><button data-filter="verified">已核验</button><button data-filter="current">进行中</button><button data-filter="upcoming">未开始</button><button id="expandAll">全部展开</button><button id="collapseAll">全部收起</button></div></div></div>
       <div class="timeline" id="timeline"></div>
-      <div class="empty-state" id="emptyState" hidden><h3>没有匹配的行程</h3><p>试试其他城市、日期或关键词。</p><button class="button" id="clearFilters">清除搜索与筛选</button></div>
-      <aside class="backup-panel"><div><strong>随手核验，安心留存</strong><p>核验记录仅保存在当前浏览器。下载备份，可在另一台设备恢复。</p></div><div class="backup-actions"><button class="button" id="openEditor">助理编辑</button><button class="button" id="backupProgress">备份进度</button><button class="button" id="restoreProgress">恢复进度</button><input type="file" id="backupFile" accept="application/json,.json" hidden></div></aside>
-      <p id="storageNotice" class="notice" role="status" aria-live="polite"></p>
     </section>
-    <footer><div class="footer-left"><span>行程统筹及编排</span><b>郭璇 · 在华助理</b></div><p>时间进度按北京时间自动计算<br>计划日期结束不代表已核验完成</p></footer>
+    <footer><div class="footer-left"><span>行程统筹及编排</span><b>郭璇 · 在华助理</b></div><p>安全分享版 · 敏感资料已从文件中移除<br>进度按北京时间自动计算</p></footer>
   </main>
-  <dialog id="editor" aria-labelledby="editorTitle"><div class="dialog-head"><h2 id="editorTitle">助理编辑</h2><button class="button" id="closeEditor" aria-label="关闭编辑">关闭</button></div><p>调整只保存在此设备。日期显示的修改不会改变进度计算日期。</p><label>选择行程阶段<select id="editStage"></select></label><form id="editForm"><label>日期显示<input id="editDate" maxlength="200" required></label><label>城市／地点<input id="editCity" maxlength="200" required></label><label>核心安排<input id="editSummary" maxlength="1000" required></label><label>助理备注<textarea id="editNote" rows="4" maxlength="5000"></textarea></label><div class="backup-actions"><button type="submit" class="button dark">保存调整</button><button type="button" class="button" id="resetStage">恢复原始内容</button></div></form></dialog>
-  <dialog id="shareDialog" aria-labelledby="shareTitle"><div class="dialog-head"><h2 id="shareTitle">分享公开行程</h2><button class="button" id="closeShare">关闭</button></div><img class="share-qr" src="assets/share-qr.svg" width="220" height="220" alt="GitHub Pages 公开行程二维码"><p>扫码打开公开行程，不包含此设备的备注与核验记录。</p><a href="https://xudaniel.github.io/xuyuanpeng-71-day-journey/">GitHub 网页版</a><div class="backup-actions"><button class="button" id="copyShare">复制链接</button><button class="button" id="nativeShare">系统分享</button><a class="button" href="assets/share-qr.svg" download="journey-qr.svg">下载二维码</a></div><p id="shareMessage" role="status"></p></dialog>
-  <script src="daily-plan.js" defer></script>
-  <script src="itinerary.js" defer></script>
-  <script src="app.js" defer></script>
-  <script src="features.js" defer></script>
+  <nav class="bottom-nav" aria-label="手机快捷导航"><button class="active" id="navToday" type="button"><span>今</span>今日</button><button id="navAll" type="button"><span>程</span>全程</button><button id="navSearch" type="button"><span>查</span>搜索</button><button id="navPrivacy" type="button"><span>隐</span><b>安全</b></button></nav>
+  <script>
+    const SHARE_SAFE_BUILD=true;
+    const itinerary = [
+  {
+    "start": "2026-08-25",
+    "end": "2026-09-05",
+    "date": "8月25日—9月5日",
+    "city": "广州 → 深圳",
+    "eyebrow": "第一阶段 · 华南",
+    "summary": "欣远景投资有限公司业务及项目考察",
+    "details": [
+      "抵达广州后转赴深圳，开展欣远景投资有限公司业务及项目考察",
+      "会面人员信息已在内部版留存",
+      "走访前海创业中心"
+    ]
+  },
+  {
+    "start": "2026-09-06",
+    "end": "2026-09-06",
+    "date": "9月6日 · 周日",
+    "city": "上海 · 婚礼",
+    "eyebrow": "第二阶段 · 上海",
+    "summary": "私人活动",
+    "details": [
+      "具体交通信息已在内部版留存",
+      "住宿安排已在内部版留存"
+    ]
+  },
+  {
+    "start": "2026-09-07",
+    "end": "2026-09-10",
+    "date": "9月7日—9月10日",
+    "city": "上海",
+    "eyebrow": "商务会面",
+    "summary": "友邦、备腾教育、抓马文娱及在沪会友",
+    "details": [
+      "住宿预订信息已在内部版留存",
+      "详细地址已在内部版留存",
+      "会面人员信息已在内部版留存",
+      "住宿安排已在内部版留存"
+    ]
+  },
+  {
+    "start": "2026-09-11",
+    "end": "2026-09-11",
+    "date": "9月11日 · 周五",
+    "city": "无锡",
+    "eyebrow": "企业参访",
+    "summary": "雅迪集团参访",
+    "details": [
+      "具体交通信息已在内部版留存",
+      "参访雅迪（港股1585）"
+    ]
+  },
+  {
+    "start": "2026-09-12",
+    "end": "2026-09-12",
+    "date": "9月12日 · 周六",
+    "city": "南京",
+    "eyebrow": "私人行程",
+    "summary": "私人安排",
+    "details": [
+      "会面人员信息已在内部版留存",
+      "住宿安排已在内部版留存"
+    ]
+  },
+  {
+    "start": "2026-09-13",
+    "end": "2026-09-14",
+    "date": "9月13日—9月14日",
+    "city": "上海",
+    "eyebrow": "返沪",
+    "summary": "继续上海会面安排",
+    "details": [
+      "住宿安排已在内部版留存",
+      "9月15日前往北京"
+    ]
+  },
+  {
+    "start": "2026-09-15",
+    "end": "2026-09-20",
+    "date": "9月15日—9月20日",
+    "city": "北京",
+    "eyebrow": "产业考察与校友会面",
+    "summary": "机器人、科技产业与在京校友交流",
+    "details": [
+      "9月16日参访亦庄机器人大世界",
+      "9月17日参访中关村发展集团",
+      "9月18日参访小米汽车工厂",
+      "会面人员信息已在内部版留存",
+      "9月21日返回深圳"
+    ]
+  },
+  {
+    "start": "2026-09-21",
+    "end": "2026-09-29",
+    "date": "9月21日—9月29日",
+    "city": "深圳",
+    "eyebrow": "投资业务",
+    "summary": "欣远景投资有限公司业务及项目考察",
+    "details": [
+      "会面人员信息已在内部版留存",
+      "9月22日参访腾讯公司（腾讯控股，港股0700）",
+      "详细地址已在内部版留存",
+      "9月30日前往江西抚州"
+    ]
+  },
+  {
+    "start": "2026-09-30",
+    "end": "2026-10-04",
+    "date": "9月30日—10月4日",
+    "city": "抚州",
+    "eyebrow": "私人行程",
+    "summary": "私人安排",
+    "details": [
+      "在抚州度过国庆节",
+      "10月5日前往南京"
+    ]
+  },
+  {
+    "start": "2026-10-05",
+    "end": "2026-10-07",
+    "date": "10月5日—10月7日",
+    "city": "南京",
+    "eyebrow": "私人行程",
+    "summary": "私人安排",
+    "details": [
+      "私人安排已在内部版留存",
+      "徐远鹏返回深圳；其他同行人员返回抚州"
+    ]
+  },
+  {
+    "start": "2026-10-08",
+    "end": "2026-10-16",
+    "date": "10月8日—10月16日",
+    "city": "深圳",
+    "eyebrow": "投资业务",
+    "summary": "欣远景投资有限公司业务及项目考察",
+    "details": [
+      "会面人员信息已在内部版留存",
+      "10月17日前往香港"
+    ]
+  },
+  {
+    "start": "2026-10-17",
+    "end": "2026-10-22",
+    "date": "10月17日—10月22日",
+    "city": "香港",
+    "eyebrow": "資本市場與校友",
+    "summary": "港島行程 · 金融機構及校友會面",
+    "details": [
+      "住宿安排已在内部版留存",
+      "參訪香港交易所：香港中環康樂廣場8號交易廣場二座8樓",
+      "会面人员信息已在内部版留存",
+      "10月23日前往日本"
+    ]
+  },
+  {
+    "start": "2026-10-23",
+    "end": "2026-10-25",
+    "date": "10月23日（周五）—10月25日（周日）",
+    "city": "东京／東京",
+    "eyebrow": "日本行程 · 東京",
+    "summary": "住宿安排",
+    "details": [
+      "住宿安排已在内部版留存",
+      "具体交通信息已在内部版留存",
+      "东京三天、三晚；10月26日前往京都／京都へ移動"
+    ]
+  },
+  {
+    "start": "2026-10-26",
+    "end": "2026-10-28",
+    "date": "10月26日（周一）—10月28日（周三）",
+    "city": "京都",
+    "eyebrow": "日本行程 · 京都",
+    "summary": "住宿安排",
+    "details": [
+      "住宿安排已在内部版留存",
+      "具体交通信息已在内部版留存",
+      "京都三天、三晚；10月29日返回深圳／深圳へ戻る"
+    ],
+    "key": "2026-10-27"
+  },
+  {
+    "start": "2026-10-29",
+    "end": "2026-11-02",
+    "date": "10月29日—11月2日",
+    "city": "深圳",
+    "eyebrow": "返深",
+    "summary": "欣远景投资有限公司业务及项目考察",
+    "details": [
+      "返回深圳继续业务及项目考察",
+      "11月3日前往广州，广州不过夜"
+    ]
+  },
+  {
+    "start": "2026-11-03",
+    "end": "2026-11-03",
+    "date": "11月3日 · 周二",
+    "city": "广州 → 多伦多",
+    "eyebrow": "离境",
+    "summary": "广州会面后飞往多伦多",
+    "details": [
+      "会面人员信息已在内部版留存",
+      "具体交通信息已在内部版留存"
+    ]
+  }
+];
+    const cities=["广州","深圳","上海","无锡","南京","上海","北京","深圳","抚州","南京","深圳","香港","东京","京都","深圳","广州","多伦多"];
+    const start=new Date(2026,7,25),end=new Date(2026,10,3),dayMs=86400000,storeKey='new-vision-itinerary-local-v1',privacyStoreKey=storeKey+'-privacy';
+    const shanghaiToday=()=>{const p=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date()).reduce((a,x)=>(x.type!=='literal'&&(a[x.type]=+x.value),a),{});return new Date(p.year,p.month-1,p.day)};
+    const parse=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+    const fmt=d=>new Intl.DateTimeFormat('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit',weekday:'short'}).format(d).replaceAll('/','.');
+    const readVerified=()=>{try{return JSON.parse(localStorage.getItem(storeKey)||'[]')}catch{return[]}};
+    const saveVerified=value=>{try{localStorage.setItem(storeKey,JSON.stringify(value))}catch{}};
+    const verified=new Set(readVerified().filter(key=>itinerary.some(x=>(x.key||x.start)===key)));
+    let filter='all',query='',previewIndex=null,privacyMode=SHARE_SAFE_BUILD?'safe':(()=>{try{return localStorage.getItem(privacyStoreKey)||'full'}catch{return'full'}})();
+    function statusOf(i,today,current){if(today<start)return'upcoming';if(today>end)return'completed';if(i<current)return'completed';if(i===current)return'current';return'upcoming'}
+    function primary(city){return city.split(' → ').at(-1).split(' · ')[0]}
+    function isFamily(value){return /家人|家庭|爷爷奶奶|親屬|亲属|探望/.test(value)}
+    function redactLine(line){
+      if(/确认号|確認號|预订人|預訂人|入住人|开票|開票|价格|價格/.test(line))return'住宿预订信息已在内部版留存';
+      if(/酒店|住宿|入住|退房|套房|房间|房間|宝丽嘉|寶麗嘉|宝格丽|寶格麗|索菲特|丽思|麗思|阿曼|吟游|吟遊|柏悦|柏悅/.test(line))return'住宿安排已在内部版留存';
+      if(/地址|总部|總部|大厦|大廈|路\d|号\b|號\b/.test(line))return'详细地址已在内部版留存';
+      if(/电话|電話|手机|手機|微信|联系人|聯絡人|管家|\d{7,}/.test(line))return'联系方式已在内部版留存';
+      if(/航班|高铁|高鐵|车次|車次|机场|機場|车站|車站|虹桥|虹橋|\b[A-Z]{1,3}\d{2,5}\b|\d{1,2}:\d{2}/.test(line))return'具体交通信息已在内部版留存';
+      if(isFamily(line))return'私人安排已在内部版留存';
+      if(/会见|會見|会面|會面|会晤|會晤|接待|陪同/.test(line))return'会面人员信息已在内部版留存';
+      return line;
+    }
+    function safeSummary(value){if(/婚礼/.test(value))return'私人活动';if(/酒店|吟游|吟遊|柏悦|柏悅/.test(value))return'住宿安排';return value.replace(/ · 周总全程接待/g,'')}
+    function displayItem(item){if(privacyMode==='full')return item;const family=isFamily([item.eyebrow,item.summary,...item.details].join(' '));return{...item,eyebrow:family?'私人行程':item.eyebrow,summary:family?'私人安排':safeSummary(item.summary),details:[...new Set(item.details.map(redactLine))]}}
+    function currentIndex(today){if(today<start)return-1;if(today>end)return itinerary.length;const started=itinerary.map((x,i)=>({i,d:parse(x.start)})).filter(x=>x.d<=today);return started.at(-1)?.i??0}
+    function actualItemIndex(current){return Math.min(Math.max(current,0),itinerary.length-1)}
+    function renderToday(today,current,day,pct){
+      const actual=actualItemIndex(current);if(previewIndex===null)previewIndex=actual;previewIndex=Math.min(Math.max(previewIndex,0),itinerary.length-1);const raw=itinerary[previewIndex],item=displayItem(raw),isActual=previewIndex===actual;
+      document.getElementById('todayDate').textContent=`${isActual?'今日':'阶段预览'} · ${item.date}`;document.getElementById('todayPlace').textContent=primary(item.city);document.getElementById('todaySummary').textContent=item.summary;document.getElementById('todayTasks').innerHTML=item.details.map(d=>`<li>${d}</li>`).join('');document.getElementById('todayProgressText').textContent=`时间进度 ${pct}% · 第 ${day} 天`;document.getElementById('todayProgressBar').style.width=pct+'%';document.getElementById('todayStageText').textContent=`第 ${previewIndex+1}／${itinerary.length} 阶段`;
+      const next=itinerary[previewIndex+1];document.getElementById('todayNext').textContent=next?`${next.date} · ${displayItem(next).city} · ${displayItem(next).summary}`:'七十一日行程完成';document.getElementById('todayPrev').disabled=previewIndex===0;document.getElementById('todayNextButton').disabled=previewIndex===itinerary.length-1;document.getElementById('todayVerify').textContent=verified.has(raw.key||raw.start)?'✓ 本阶段已核验':'标记本阶段已核验';
+    }
+    function render(){
+      const today=shanghaiToday(),elapsed=Math.floor((today-start)/dayMs),day=Math.min(71,Math.max(1,elapsed+1)),pct=today<start?0:today>end?100:Math.round(day/71*100),current=currentIndex(today),idx=actualItemIndex(current),rawCur=itinerary[idx],cur=displayItem(rawCur),rawNext=itinerary[Math.min(Math.max(current+1,0),itinerary.length-1)],next=displayItem(rawNext);
+      document.body.classList.toggle('safe-mode',privacyMode==='safe');const modeLabel=SHARE_SAFE_BUILD?'安全分享版':privacyMode==='safe'?'安全分享模式':'完整内部版';document.getElementById('privacyState').textContent=modeLabel;document.getElementById('privacyToggle').textContent=modeLabel;document.getElementById('privacyToggle').setAttribute('aria-pressed',privacyMode==='safe');document.getElementById('privacyToggle').disabled=SHARE_SAFE_BUILD;document.querySelector('#navPrivacy b').textContent=SHARE_SAFE_BUILD?'安全版':privacyMode==='safe'?'内部':'安全';document.getElementById('navPrivacy').disabled=SHARE_SAFE_BUILD;
+      renderToday(today,current,day,pct);document.getElementById('todayHeader').textContent='今天 · '+fmt(today);document.getElementById('todayLabel').textContent=fmt(today).replace('2026年','').replaceAll('.','/');document.getElementById('dayNo').textContent=day;document.getElementById('remaining').textContent=today<start?71:today>end?0:71-day;document.getElementById('timePct').textContent=pct;document.getElementById('progressBar').style.width=pct+'%';const ep=Math.round(verified.size/itinerary.length*100);document.getElementById('executionPct').textContent=ep;
+      document.getElementById('currentCity').textContent=current<0?'行程尚未开始':current>=itinerary.length?'行程已完成':primary(cur.city);document.getElementById('currentSummary').textContent=current<0?displayItem(itinerary[0]).summary:current>=itinerary.length?'七十一日行程圆满完成':cur.summary;document.getElementById('currentDetail').textContent=current>=0&&current<itinerary.length?cur.details[0]:'—';document.getElementById('nextMove').textContent=current>=itinerary.length?'—':next.city;document.getElementById('nextDate').textContent=current>=itinerary.length?'':next.date;
+      const active=current>=0&&current<itinerary.length,stageLeft=active?Math.max(0,Math.floor((parse(rawCur.end)-today)/dayMs)):0,nextIn=current<itinerary.length?Math.max(0,Math.floor((parse(rawNext.start)-today)/dayMs)):0;document.getElementById('briefFocus').textContent=active?cur.summary:current<0?'行程准备':'行程已完成';document.getElementById('briefDetail').textContent=active?cur.details[0]:current<0?'核对首段抵达与转场安排':'七十一日行程已全部结束';document.getElementById('stageRemaining').textContent=!active?(current<0?'尚未开始':'已完成'):stageLeft===0?'今日结束':`还剩 ${stageLeft} 天`;document.getElementById('stageWindow').textContent=active?`${cur.date} · ${cur.city}`:'—';document.getElementById('nextCountdown').textContent=current>=itinerary.length?'—':nextIn===0?'今日转场':`还有 ${nextIn} 天`;document.getElementById('nextBrief').textContent=current>=itinerary.length?'无后续行程':`${next.date} · ${next.city}`;
+      document.getElementById('route').innerHTML=cities.map((c,i)=>`<li><b>${String(i+1).padStart(2,'0')}</b>${c}${i<cities.length-1?'<em>→</em>':''}</li>`).join('');
+      let shown=0;document.getElementById('timeline').innerHTML=itinerary.map((raw,i)=>{const x=displayItem(raw),st=statusOf(i,today,current),isV=verified.has(raw.key||raw.start),stateMatch=filter==='all'||filter==='verified'&&isV||filter===st,searchMatch=!query||[x.date,x.city,x.eyebrow,x.summary,...x.details].join(' ').toLowerCase().includes(query);if(!stateMatch||!searchMatch)return'';shown++;const label=isV?'已核验':st==='completed'?'已结束':st==='current'?'进行中':'未开始';return `<article class="row ${st} ${isV?'verified':''} ${st==='current'?'open':''}" data-status="${st}"><div class="marker"><span>${isV?'✓':String(i+1).padStart(2,'0')}</span></div><button class="main" type="button" aria-expanded="${st==='current'}"><div class="date">${x.date}</div><div class="place"><small>${x.eyebrow}</small><h3>${x.city}</h3></div><p class="summary">${x.summary}</p><span class="badge">${label}</span><span class="chevron">⌄</span></button><div class="details"><div class="details-inner"><ul>${x.details.map(d=>`<li>${d}</li>`).join('')}</ul><label class="verify"><input type="checkbox" data-start="${raw.key||raw.start}" ${isV?'checked':''}> 标记为已核验完成</label></div></div></article>`}).join('');document.getElementById('resultCount').textContent=`${shown} 项`;
+      document.querySelectorAll('.main').forEach(b=>b.onclick=()=>{const row=b.closest('.row');row.classList.toggle('open');b.setAttribute('aria-expanded',row.classList.contains('open'))});document.querySelectorAll('.verify input').forEach(c=>c.onchange=()=>{c.checked?verified.add(c.dataset.start):verified.delete(c.dataset.start);saveVerified([...verified]);render()});
+    }
+    function addDay(value){const d=parse(value);d.setDate(d.getDate()+1);return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`}
+    function icsEscape(value){return value.replaceAll('\\','\\\\').replaceAll(';','\\;').replaceAll(',','\\,').replaceAll('\n','\\n')}
+    function exportCalendar(){const stamp=new Date().toISOString().replaceAll('-','').replaceAll(':','').replace(/\.\d{3}Z$/,'Z');const events=itinerary.map(displayItem).map(x=>['BEGIN:VEVENT',`UID:${x.start}@newvision.travel`,`DTSTAMP:${stamp}`,`DTSTART;VALUE=DATE:${x.start.replaceAll('-','')}`,`DTEND;VALUE=DATE:${addDay(x.end)}`,`SUMMARY:${icsEscape(`${x.city} · ${x.summary}`)}`,`LOCATION:${icsEscape(x.city)}`,`DESCRIPTION:${icsEscape(x.details.join('\n'))}`,'END:VEVENT'].join('\r\n'));const content=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//New Vision Investment//71 Day Journey//ZH','CALSCALE:GREGORIAN','METHOD:PUBLISH',...events,'END:VCALENDAR'].join('\r\n');const url=URL.createObjectURL(new Blob([content],{type:'text/calendar;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download=privacyMode==='safe'?'徐远鹏_七十一日行程_安全版.ics':'徐远鹏_七十一日行程.ics';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+    function setView(view,search=false){document.getElementById('top').dataset.view=view;document.getElementById('navToday').classList.toggle('active',view==='today');document.getElementById('navAll').classList.toggle('active',view==='all'&&!search);document.getElementById('navSearch').classList.toggle('active',search);if(view==='today'){previewIndex=null;render();window.scrollTo({top:0,behavior:'smooth'})}else{setTimeout(()=>{const target=document.getElementById('timelineSection');target.scrollIntoView({behavior:'smooth',block:'start'});if(search)document.getElementById('searchInput').focus()},0)}}
+    function togglePrivacy(){if(SHARE_SAFE_BUILD)return;privacyMode=privacyMode==='full'?'safe':'full';try{localStorage.setItem(privacyStoreKey,privacyMode)}catch{}render()}
+    function shiftPreview(delta){const current=currentIndex(shanghaiToday());if(previewIndex===null)previewIndex=actualItemIndex(current);previewIndex=Math.min(Math.max(previewIndex+delta,0),itinerary.length-1);render()}
+    document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{filter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));render()});document.getElementById('searchInput').oninput=e=>{query=e.target.value.trim().toLowerCase();render()};document.getElementById('exportCalendar').onclick=exportCalendar;document.getElementById('expandAll').onclick=()=>document.querySelectorAll('.row').forEach(r=>r.classList.add('open'));document.getElementById('collapseAll').onclick=()=>document.querySelectorAll('.row').forEach(r=>r.classList.remove('open'));document.getElementById('showAll').onclick=()=>setView('all');document.getElementById('navToday').onclick=()=>setView('today');document.getElementById('navAll').onclick=()=>setView('all');document.getElementById('navSearch').onclick=()=>setView('all',true);document.getElementById('privacyToggle').onclick=togglePrivacy;document.getElementById('navPrivacy').onclick=togglePrivacy;document.getElementById('todayPrev').onclick=()=>shiftPreview(-1);document.getElementById('todayNextButton').onclick=()=>shiftPreview(1);document.getElementById('todayVerify').onclick=()=>{const raw=itinerary[previewIndex??actualItemIndex(currentIndex(shanghaiToday()))];verified.has(raw.key||raw.start)?verified.delete(raw.key||raw.start):verified.add(raw.key||raw.start);saveVerified([...verified]);render()};let touchX=0;const todayView=document.getElementById('todayView');todayView.addEventListener('touchstart',e=>{touchX=e.changedTouches[0].clientX},{passive:true});todayView.addEventListener('touchend',e=>{const delta=e.changedTouches[0].clientX-touchX;if(Math.abs(delta)>55)shiftPreview(delta<0?1:-1)},{passive:true});render();
+  </script>
 </body>
 </html>
