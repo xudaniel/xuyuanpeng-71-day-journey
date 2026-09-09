@@ -96,7 +96,7 @@
   <nav class="bottom-nav" aria-label="手机快捷导航"><button class="active" id="navToday" type="button"><span>今</span>今日</button><button id="navAll" type="button"><span>程</span>全程</button><button id="navSearch" type="button"><span>查</span>搜索</button><button id="navPrivacy" type="button"><span>隐</span><b>安全</b></button></nav>
   <script>
     const SHARE_SAFE_BUILD=true;
-    const itinerary = [
+const itinerary = [
   {
     "start": "2026-08-25",
     "end": "2026-09-05",
@@ -152,54 +152,27 @@
     "start": "2026-09-12",
     "end": "2026-09-12",
     "date": "9月12日 · 周六",
-    "city": "南京",
+    "city": "南京 → 无锡",
     "eyebrow": "私人行程",
-    "summary": "私人安排",
+    "summary": "私人安排及城市转场",
     "details": [
-      "会面人员信息已在内部版留存",
-      "住宿安排已在内部版留存"
+      "私人安排已在内部版留存",
+      "晚间返回无锡；具体交通信息已在内部版留存"
     ]
   },
   {
     "start": "2026-09-13",
-    "end": "2026-09-14",
-    "date": "9月13日—9月14日",
-    "city": "上海",
-    "eyebrow": "返沪",
-    "summary": "继续上海会面安排",
-    "details": [
-      "住宿安排已在内部版留存",
-      "9月15日前往北京"
-    ]
-  },
-  {
-    "start": "2026-09-15",
-    "end": "2026-09-20",
-    "date": "9月15日—9月20日",
-    "city": "北京",
-    "eyebrow": "产业考察与校友会面",
-    "summary": "机器人、科技产业与在京校友交流",
-    "details": [
-      "9月16日参访亦庄机器人大世界",
-      "9月17日参访中关村发展集团",
-      "9月18日参访小米汽车工厂",
-      "会面人员信息已在内部版留存",
-      "9月21日返回深圳"
-    ]
-  },
-  {
-    "start": "2026-09-21",
     "end": "2026-09-29",
-    "date": "9月21日—9月29日",
+    "date": "9月13日（周日）—9月29日（周二）",
     "city": "深圳",
     "eyebrow": "投资业务",
     "summary": "欣远景投资有限公司业务及项目考察",
     "details": [
-      "会面人员信息已在内部版留存",
+      "欣远景投资有限公司业务及项目考察",
       "9月22日参访腾讯公司（腾讯控股，港股0700）",
-      "详细地址已在内部版留存",
-      "9月30日前往江西抚州"
-    ]
+      "9月30日前往江西抚州；具体交通信息已在内部版留存"
+    ],
+    "key": "2026-09-21"
   },
   {
     "start": "2026-09-30",
@@ -209,7 +182,8 @@
     "eyebrow": "私人行程",
     "summary": "私人安排",
     "details": [
-      "在抚州度过国庆节",
+      "私人安排已在内部版留存",
+      "9月30日从深圳前往江西抚州",
       "10月5日前往南京"
     ]
   },
@@ -303,7 +277,7 @@
     ]
   }
 ];
-    const cities=["广州","深圳","上海","无锡","南京","上海","北京","深圳","抚州","南京","深圳","香港","东京","京都","深圳","广州","多伦多"];
+const cities=["广州","深圳","上海","无锡","南京","无锡","深圳","抚州","南京","深圳","香港","东京","京都","深圳","广州","多伦多"];
     const start=new Date(2026,7,25),end=new Date(2026,10,3),dayMs=86400000,storeKey='new-vision-itinerary-local-v1',privacyStoreKey=storeKey+'-privacy';
     const shanghaiToday=()=>{const p=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date()).reduce((a,x)=>(x.type!=='literal'&&(a[x.type]=+x.value),a),{});return new Date(p.year,p.month-1,p.day)};
     const parse=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
