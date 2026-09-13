@@ -26,7 +26,10 @@ test('existing password flow decrypts, revises and then renders without losing u
  const plain=fixture(),password='test-only-password',salt=crypto.randomBytes(16),iv=crypto.randomBytes(12),iterations=310000;
  const cipher=crypto.createCipheriv('aes-256-gcm',crypto.pbkdf2Sync(password,salt,iterations,32,'sha256'),iv);
  const payload=Buffer.concat([cipher.update(plain),cipher.final(),cipher.getAuthTag()]).toString('base64');
- const source=script.replace(/const payload='[^']+',salt='[^']+',iv='[^']+',iterations=\d+/,`const payload='${payload}',salt='${salt.toString('base64')}',iv='${iv.toString('base64')}',iterations=${iterations}`);
+ // This unit test isolates route revision from the execution UI; browser tests exercise the full unlock hook.
+ const source=script.replace(/const payload='[^']+',salt='[^']+',iv='[^']+',iterations=\d+/,`const payload='${payload}',salt='${salt.toString('base64')}',iv='${iv.toString('base64')}',iterations=${iterations}`)
+ .replace("const {prepareExecution}=await import('./app/boot.mjs');",'const prepareExecution=async()=>()=>{};')
+ .replace(/startExecution\(\{[\s\S]*?\n\s*\}\);/,'');
  let handler,written;const controls={login:{addEventListener:(type,fn)=>handler=fn},unlock:{},status:{},password:{value:password,select(){}}};
  const context={crypto:crypto.webcrypto,TextEncoder,TextDecoder,Uint8Array,atob,setTimeout,document:{getElementById:id=>controls[id],open(){},write:html=>written=html,close(){}}};
  vm.createContext(context);vm.runInContext(source,context);await handler({preventDefault(){}});
