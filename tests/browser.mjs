@@ -39,11 +39,12 @@ try {
   await page.goto(base+'/synthetic-private.html');await page.locator('#password').fill('wrong');await button('解锁完整行程').click();await page.getByText('密码不正确，请重新输入。',{exact:true}).waitFor();assert.equal(await page.locator('#execution-root').count(),0);
   await openFixture();
   await page.locator('#os-date').fill('2026-09-22');await page.locator('#os-date').dispatchEvent('change');
+  const startingP0=Number((await page.getByRole('button',{name:/^P0 · /}).innerText()).split(' · ')[1]);
   await button('新增行动').click();await page.getByLabel('下一步行动',{exact:true}).fill('PRIVATE SENTINEL — prepare agenda');await page.locator('dialog [name=priority]').selectOption('P0');await saveDialog();
-  await button('P0 · 1').waitFor();
+  await button('P0 · '+(startingP0+1)).waitFor();
   const stored=await page.evaluate(()=>localStorage.getItem('journey-execution-encrypted-v1'));assert.ok(stored);assert.ok(!stored.includes('PRIVATE SENTINEL'));assert.ok(!stored.includes(password));
   await page.reload();await page.locator('#password').fill(password);await button('解锁完整行程').click();await page.locator('#execution-root').waitFor();await button('待办与跟进').click();await page.getByRole('heading',{name:'PRIVATE SENTINEL — prepare agenda'}).waitFor();
-  await button('会面').click();await page.locator('.os-meetings button').filter({hasText:'腾讯'}).click();
+  await button('会面与活动').click();await page.locator('.os-meetings button').filter({hasText:'腾讯'}).click();
   for(let i=0;i<4;i++)await page.locator(`[name="prep-${i}"]`).selectOption('done');await button('保存准备清单').click();await page.getByRole('heading',{name:'准备度 80% · 4/5'}).waitFor();
   await page.locator('[name="prep-4"]').selectOption('done');await button('保存准备清单').click();await page.getByRole('heading',{name:'准备度 100% · 5/5'}).waitFor();
   await button('标记准备就绪').click();await saveDialog('确认阶段');
@@ -59,6 +60,44 @@ try {
   await button('交通住宿').click();await button('新增安排').click();await page.getByLabel('安排名称',{exact:true}).fill('Synthetic train');await page.getByLabel('计划日期',{exact:true}).fill('2026-09-25');await page.getByLabel('确认截止日期／时间',{exact:true}).fill('2026-09-22');await page.getByLabel('下一步',{exact:true}).fill('Confirm train');await saveDialog();
   await page.locator('[name="travel-filter"]').selectOption('all');await page.locator('.os-record').filter({hasText:'Synthetic train'}).getByRole('button',{name:'编辑／确认',exact:true}).click();await page.getByLabel('确认状态',{exact:true}).selectOption('confirmed');await page.getByLabel('确认记录／取消原因').fill('Verified synthetic ticket');await saveDialog();
   assert.ok(await page.locator('.os-record').filter({hasText:'Synthetic train'}).getByText('已确认',{exact:true}).count());
+  // Readiness is editable from the linked travel record and persists independently of preparation.
+  await page.locator('#os-date').fill('2026-09-22');await page.locator('#os-date').dispatchEvent('change');
+  const train=()=>page.locator('.os-record').filter({has:page.getByRole('heading',{name:'Synthetic train',exact:true})});
+  await page.locator('[name="travel-filter"]').selectOption('all');
+  await train().getByRole('button',{name:'编辑／确认',exact:true}).click();
+  await page.getByLabel('计划日期',{exact:true}).fill('2026-09-22');await page.getByLabel('确切时间（含时区，可留空）').fill('2026-09-22T15:00+08:00');await saveDialog();
+  await train().getByRole('button',{name:'更新就绪信息',exact:true}).click();
+  assert.equal(await page.evaluate(()=>document.querySelector('dialog').scrollWidth<=document.querySelector('dialog').clientWidth),true);
+  for(const key of ['terminal','arrival','hotel','localTransport','documents','host','calendar'])await page.locator('dialog [name="ready-'+key+'"]').fill('Verified synthetic information');
+  await saveDialog();await train().getByText('就绪信息 READY · 9/9',{exact:true}).waitFor();
+  await train().getByRole('button',{name:'查看执行流程',exact:true}).click();assert.equal(await page.locator('.os-stages [aria-current]').innerText(),'Planned\n计划');
+  await button('会面与活动').click();await button('新增会面').click();
+  await page.getByLabel('会面名称',{exact:true}).fill('Synthetic readiness visit');await page.getByLabel('活动类型',{exact:true}).selectOption('visit');
+  await page.getByLabel('计划日期（未知可留空）').fill('2026-09-22');await page.getByLabel('计划时间（未知可留空）').fill('14:00');
+  await page.getByLabel('地点',{exact:true}).fill('Synthetic room');await page.getByLabel('接待／联系人',{exact:true}).fill('Synthetic Partner');await saveDialog();
+  assert.equal(await button('标记准备就绪').isDisabled(),true);
+  await page.locator('.os-detail').getByRole('button',{name:'更新就绪信息',exact:true}).click();
+  for(const key of ['dateConfirmed','timeConfirmed','locationConfirmed'])await page.locator('dialog [name="'+key+'"]').check();
+  for(const key of ['objective','research','question1','question2','question3','documents','followupObjective'])await page.locator('dialog [name="ready-'+key+'"]').fill('Synthetic information');
+  await saveDialog();await page.locator('.os-detail').getByText('就绪信息 READY · 11/11',{exact:true}).waitFor();assert.equal(await button('标记准备就绪').isDisabled(),true);
+  // Create a person-linked follow-up with quick dates; closed history remains searchable.
+  await button('新增后续行动').click();await page.getByLabel('下一步行动',{exact:true}).fill('Synthetic partner follow-up');
+  await page.getByLabel('负责人',{exact:true}).fill('Traveler');await page.getByLabel('相关人物／公司',{exact:true}).fill('Synthetic Partner');await page.getByLabel('沟通渠道',{exact:true}).fill('Email');
+  await page.locator('dialog').getByRole('button',{name:'三天后',exact:true}).click();assert.equal(await page.getByLabel('目标截止日期／时间',{exact:true}).inputValue(),'2026-09-25');
+  await page.getByLabel('状态',{exact:true}).selectOption('completed');await page.getByLabel('交付确认记录／取消原因').fill('Delivered');await saveDialog();
+  await button('人物历史').click();await page.getByLabel('搜索人物／公司',{exact:true}).fill('Synthetic Partner');await page.getByLabel('搜索人物／公司',{exact:true}).press('Tab');
+  await page.getByRole('heading',{name:'Synthetic partner follow-up',exact:true}).waitFor();await button('Synthetic readiness visit').waitFor();
+  // An ordinary task can opt into the same lifecycle without duplicating its action.
+  await button('待办与跟进').click();const sourceTask=page.locator('.os-record').filter({has:page.getByRole('heading',{name:'PRIVATE SENTINEL — prepare agenda',exact:true})});
+  await sourceTask.getByRole('button',{name:'启用执行流程',exact:true}).click();await page.locator('.os-detail h3').filter({hasText:'PRIVATE SENTINEL'}).waitFor();
+  await button('补录已发生会面').click();await page.getByLabel('实际完成时间（带时区）').fill(new Date(Date.now()-3600000).toISOString());await page.getByLabel('补录／更正原因（正常推进可留空）').fill('Recorded task result');await saveDialog('确认阶段');
+  await page.getByLabel('成果摘要',{exact:true}).fill('Synthetic task result');await button('保存成果').click();await button('确认成果已记录').click();await saveDialog('确认阶段');
+  await button('复核后续行动').click();await page.getByLabel('若无需跟进，请说明原因').fill('Task fully delivered');await saveDialog('确认阶段');await button('关闭会面').click();await saveDialog('确认阶段');
+  await page.locator('[name="meeting-filter"]').selectOption('stage:Closed');await page.getByLabel('搜索活动／成果／联系人').fill('PRIVATE SENTINEL');await page.getByLabel('搜索活动／成果／联系人').press('Tab');assert.equal(await page.locator('.os-meetings button').count(),1);
+  await page.locator('#os-date').fill('2026-09-23');await page.locator('#os-date').dispatchEvent('change');await button('会面与活动').click();await page.locator('[name="meeting-filter"]').selectOption('verification');
+  await page.locator('.os-meetings button').filter({hasText:'Synthetic readiness visit'}).click();await page.locator('.os-detail .os-warning').filter({hasText:'Needs Verification'}).waitFor();
+  // Readiness and generic activity records survive encrypted reload.
+  await openFixture();await button('交通住宿').click();await page.locator('[name="travel-filter"]').selectOption('all');await train().getByText('就绪信息 READY · 9/9',{exact:true}).waitFor();
   await button('今日队列').click();
   // Storage failure must keep the form, preserve entered text, and show an error.
   await button('新增行动').click();await page.getByLabel('下一步行动',{exact:true}).fill('Unsaved action');
@@ -83,5 +122,5 @@ try {
   await page.goto(base+'/');assert.equal(await page.locator('#execution-root').count(),0);assert.ok(!(await page.locator('body').innerText()).includes('PRIVATE SENTINEL'));
   const publicDownload=page.waitForEvent('download');await page.locator('#exportTodayCalendar').click();const download=await publicDownload;const stream=await download.createReadStream();let calendar='';for await(const chunk of stream)calendar+=chunk;assert.ok(!calendar.includes('PRIVATE SENTINEL'));assert.ok(calendar.includes('BEGIN:VCALENDAR'));
   assert.deepEqual(errors,[]);
-  console.log('Browser checks passed: unlock, encrypted reload, prep, lifecycle, Waiting For, closure, travel, save failure, mobile, safe mode, public calendar.');
+  console.log('Browser checks passed: unlock, encrypted reload, preparation, meeting/task/travel lifecycle, Waiting For, closure/reopen, readiness forms, quick dates, person history, archive search, verification alerts, save failure, backup/restore, mobile, safe mode, public calendar.');
 } catch(e) {console.error('Page errors:',errors);console.error((await page.locator('body').innerText()).slice(0,2500));throw e;} finally {await browser.close();await new Promise(r=>server.close(r));}
