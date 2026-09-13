@@ -84,11 +84,11 @@
       <div><span>下一转场</span><strong id="nextCountdown">—</strong><p id="nextBrief">—</p></div>
     </section>
     <section class="section full-view">
-      <div class="section-head"><div><p class="kicker">完整路线</p><h2 class="section-title">十八个城市节点</h2></div><span class="section-note">只列城市 · 快速总览</span></div>
+      <div class="section-head"><div><p class="kicker">完整路线</p><h2 class="section-title">12个城市节点</h2></div><span class="section-note">只列城市 · 快速总览</span></div>
       <ol class="route" id="route"></ol>
     </section>
     <section class="section full-view" id="timelineSection">
-      <div class="section-head"><div><p class="kicker">执行时间线</p><h2 class="section-title">十六个行程阶段</h2></div><div class="timeline-actions"><label class="search"><input id="searchInput" type="search" placeholder="搜索城市、人物、公司或日期" autocomplete="off"><output id="resultCount">16 项</output></label><div class="controls"><button class="active" data-filter="all">全部</button><button data-filter="verified">已核验</button><button data-filter="overdue">逾期待核验</button><button data-filter="current">进行中</button><button data-filter="upcoming">未开始</button><button id="expandAll">全部展开</button><button id="collapseAll">全部收起</button></div></div></div>
+      <div class="section-head"><div><p class="kicker">执行时间线</p><h2 class="section-title">10个行程阶段</h2></div><div class="timeline-actions"><label class="search"><input id="searchInput" type="search" placeholder="搜索城市、人物、公司或日期" autocomplete="off"><output id="resultCount">10 项</output></label><div class="controls"><button class="active" data-filter="all">全部</button><button data-filter="verified">已核验</button><button data-filter="overdue">逾期待核验</button><button data-filter="current">进行中</button><button data-filter="upcoming">未开始</button><button id="expandAll">全部展开</button><button id="collapseAll">全部收起</button></div></div></div>
       <div class="timeline" id="timeline"></div>
     </section>
     <footer><div class="footer-left"><span>行程统筹及编排</span><b>郭璇 · 在华助理</b></div><p>安全分享版 · 敏感资料已从文件中移除<br>进度按北京时间自动计算</p></footer>
@@ -162,68 +162,19 @@ const itinerary = [
   },
   {
     "start": "2026-09-13",
-    "end": "2026-09-29",
-    "date": "9月13日（周日）—9月29日（周二）",
+    "end": "2026-10-22",
+    "date": "9月13日（周日）—10月22日（周四）",
     "city": "深圳",
-    "eyebrow": "投资业务",
-    "summary": "欣远景投资有限公司业务及项目考察",
+    "eyebrow": "投资业务 · 留深",
+    "summary": "赴日本前持续留在深圳，开展业务及项目考察",
     "details": [
       "欣远景投资有限公司业务及项目考察",
       "9月22日参访腾讯公司（腾讯控股，港股0700）",
-      "9月30日前往江西抚州；具体交通信息已在内部版留存"
+      "会面人员信息已在内部版留存",
+      "9月13日至10月22日持续留在深圳；国庆及赴日前均不安排外地停留",
+      "10月23日赴日本；日本及之后行程不变"
     ],
-    "key": "2026-09-21"
-  },
-  {
-    "start": "2026-09-30",
-    "end": "2026-10-04",
-    "date": "9月30日—10月4日",
-    "city": "抚州",
-    "eyebrow": "私人行程",
-    "summary": "私人安排",
-    "details": [
-      "私人安排已在内部版留存",
-      "9月30日从深圳前往江西抚州",
-      "10月5日前往南京"
-    ]
-  },
-  {
-    "start": "2026-10-05",
-    "end": "2026-10-07",
-    "date": "10月5日—10月7日",
-    "city": "南京",
-    "eyebrow": "私人行程",
-    "summary": "私人安排",
-    "details": [
-      "私人安排已在内部版留存",
-      "徐远鹏返回深圳；其他同行人员返回抚州"
-    ]
-  },
-  {
-    "start": "2026-10-08",
-    "end": "2026-10-16",
-    "date": "10月8日—10月16日",
-    "city": "深圳",
-    "eyebrow": "投资业务",
-    "summary": "欣远景投资有限公司业务及项目考察",
-    "details": [
-      "会面人员信息已在内部版留存",
-      "10月17日前往香港"
-    ]
-  },
-  {
-    "start": "2026-10-17",
-    "end": "2026-10-22",
-    "date": "10月17日—10月22日",
-    "city": "香港",
-    "eyebrow": "資本市場與校友",
-    "summary": "港島行程 · 金融機構及校友會面",
-    "details": [
-      "住宿安排已在内部版留存",
-      "參訪香港交易所：香港中環康樂廣場8號交易廣場二座8樓",
-      "会面人员信息已在内部版留存",
-      "10月23日前往日本"
-    ]
+    "key": "shenzhen-2026-09-13-through-2026-10-22"
   },
   {
     "start": "2026-10-23",
@@ -277,7 +228,7 @@ const itinerary = [
     ]
   }
 ];
-const cities=["广州","深圳","上海","无锡","南京","无锡","深圳","抚州","南京","深圳","香港","东京","京都","深圳","广州","多伦多"];
+const cities=["广州","深圳","上海","无锡","南京","无锡","深圳","东京","京都","深圳","广州","多伦多"];
     const start=new Date(2026,7,25),end=new Date(2026,10,3),dayMs=86400000,storeKey='new-vision-itinerary-local-v1',privacyStoreKey=storeKey+'-privacy';
     const shanghaiToday=()=>{const p=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date()).reduce((a,x)=>(x.type!=='literal'&&(a[x.type]=+x.value),a),{});return new Date(p.year,p.month-1,p.day)};
     const parse=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
