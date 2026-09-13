@@ -37,6 +37,8 @@
 
 这是一个纯静态网站，无需安装依赖或运行构建流程。
 
+执行中心的运行文件位于 `app/`，在完整版解锁后加载。开发测试配置为 `package.json`、`pnpm-lock.yaml` 和 `.github/workflows/execution-tests.yml`；网站运行和部署不需要安装开发依赖。[执行中心的数据、备份及验证说明](execution.md)
+
 ## 使用与维护
 
 1. 对外只分享公开入口。
