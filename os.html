@@ -18,6 +18,7 @@
       <p class="lead">你的个人执行系统。数据只保存在当前设备，并以密码加密。</p>
       <form id="unlockForm" class="stack">
         <label>本机密码<input id="vaultPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="输入密码"></label>
+        <label id="confirmWrap" hidden>再次输入密码<input id="vaultConfirm" type="password" autocomplete="new-password" minlength="6" placeholder="确认密码"></label>
         <button class="primary big" type="submit">进入系统</button>
       </form>
       <p id="unlockStatus" class="status-text" aria-live="polite"></p>

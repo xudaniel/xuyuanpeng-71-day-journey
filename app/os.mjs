@@ -5,14 +5,15 @@ const $=id=>document.getElementById(id), qa=s=>[...document.querySelectorAll(s)]
 const seed=await fetch('./data/journey.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('行程数据加载失败');return r.json()});
 const validation=validateJourneyData(seed);if(!validation.ok)throw new Error(validation.errors.join('\n'));
 const store=new EncryptedStore();let state=null,pendingStage=null,pendingRestore=null,selectedPersonId=null;
-const tripTz=seed.trip.timeZone;
+const tripTz=seed.trip.timeZone, firstUse=!localStorage.getItem('71day-os-state-v1');
+$('confirmWrap').hidden=!firstUse;if(firstUse){$('vaultPassword').autocomplete='new-password';$('vaultConfirm').required=true;}
 
 function esc(v=''){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function formatDate(v){if(!v)return'—';return new Intl.DateTimeFormat('zh-CN',{month:'short',day:'numeric',weekday:'short',timeZone:'UTC'}).format(new Date(v+'T12:00:00Z'));}
 function toast(text,undo=false){const el=$('toast');el.innerHTML=esc(text)+(undo?' · <button id="toastUndo" style="border:0;background:transparent;color:white;text-decoration:underline">撤销</button>':'');el.classList.add('show');if(undo)$('toastUndo').onclick=async()=>{state=undoLastChange(state);await save('已撤销');renderAll();};clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),4200);}
 async function save(message='已保存'){await store.save(state);toast(message);}
 
-$('unlockForm').addEventListener('submit',async e=>{e.preventDefault();const password=$('vaultPassword').value;$('unlockStatus').textContent='正在解锁…';try{const result=await store.unlock(password);state=result.state;$('lockScreen').hidden=true;$('app').hidden=false;$('vaultPassword').value='';$('unlockStatus').textContent='';renderAll();if(result.created)toast('本机保险库已创建');}catch(err){$('unlockStatus').textContent=err.message;}});
+$('unlockForm').addEventListener('submit',async e=>{e.preventDefault();const password=$('vaultPassword').value;if(firstUse&&password!==$('vaultConfirm').value){$('unlockStatus').textContent='两次输入的密码不一致。';return;}$('unlockStatus').textContent='正在解锁…';try{const result=await store.unlock(password);state=result.state;$('lockScreen').hidden=true;$('app').hidden=false;$('vaultPassword').value='';$('vaultConfirm').value='';$('unlockStatus').textContent='';renderAll();if(result.created)toast('本机保险库已创建');}catch(err){$('unlockStatus').textContent=err.message;}});
 $('lockButton').onclick=()=>{store.lock();state=null;$('app').hidden=true;$('lockScreen').hidden=false;$('vaultPassword').focus();};
 
 qa('[data-nav]').forEach(btn=>btn.addEventListener('click',()=>navigate(btn.dataset.nav)));
