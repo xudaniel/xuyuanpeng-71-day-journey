@@ -1,0 +1,58 @@
+name: Mobile OS tests
+on:
+  pull_request:
+    paths:
+      - "os.html"
+      - "app/**"
+      - "data/**"
+      - "tests/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "manifest.webmanifest"
+      - "sw.js"
+      - ".github/workflows/mobile-os-tests.yml"
+  push:
+    branches: [main, feature/mobile-71day-os]
+    paths:
+      - "os.html"
+      - "app/**"
+      - "data/**"
+      - "tests/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "manifest.webmanifest"
+      - "sw.js"
+      - ".github/workflows/mobile-os-tests.yml"
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: pnpm/action-setup@v4
+        with:
+          version: "11.19.0"
+      - run: pnpm install --frozen-lockfile
+      - name: Syntax check
+        run: |
+          for file in app/*.mjs sw.js; do node --check "$file"; done
+      - name: Unit tests
+        run: pnpm test
+      - name: Install browser
+        run: pnpm exec playwright install --with-deps chromium webkit
+      - name: Mobile and desktop browser workflow
+        run: pnpm test:browser
+      - name: WebKit mobile compatibility
+        run: pnpm test:browser
+        env:
+          BROWSER_ENGINE: webkit
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mobile-os-browser-results
+          path: test-results/
+          if-no-files-found: ignore

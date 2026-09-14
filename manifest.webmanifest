@@ -1,0 +1,9 @@
+{
+  "name":"71-Day Operating System",
+  "short_name":"71-Day OS",
+  "start_url":"./os.html",
+  "display":"standalone",
+  "background_color":"#f4f2ed",
+  "theme_color":"#f4f2ed",
+  "lang":"zh-CN"
+}

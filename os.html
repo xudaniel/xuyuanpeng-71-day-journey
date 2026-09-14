@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#f4f2ed" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <title>71-Day OS｜徐远鹏</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="stylesheet" href="app/os.css" />
+  </head>
+  <body>
+    <main id="lockScreen" class="lock-screen">
+      <section class="lock-card">
+        <p class="eyebrow">PERSONAL · LOCAL-FIRST</p>
+        <h1>71-Day OS</h1>
+        <p class="lead">
+          你的个人执行系统。数据只保存在当前设备，并以密码加密。
+        </p>
+        <form id="unlockForm" class="stack">
+          <label
+            >本机密码<input
+              id="vaultPassword"
+              type="password"
+              autocomplete="current-password"
+              minlength="6"
+              required
+              placeholder="输入密码"
+          /></label>
+          <label id="confirmWrap" hidden
+            >再次输入密码<input
+              id="vaultConfirm"
+              type="password"
+              autocomplete="new-password"
+              minlength="6"
+              placeholder="确认密码"
+          /></label>
+          <button class="primary big" type="submit">进入系统</button>
+        </form>
+        <p id="unlockStatus" class="status-text" aria-live="polite"></p>
+        <details>
+          <summary>第一次打开？</summary>
+          <p>
+            输入一个至少 6
+            位的密码即可创建本机保险库。密码不会上传，也无法由网站替你找回。
+          </p>
+        </details>
+      </section>
+    </main>
+
+    <div id="app" class="app" hidden>
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">71-DAY OPERATING SYSTEM</p>
+          <strong id="headerTitle">今日</strong>
+        </div>
+        <button
+          id="lockButton"
+          class="icon-button"
+          type="button"
+          aria-label="锁定"
+        >
+          锁定
+        </button>
+      </header>
+
+      <main class="pages">
+        <section class="page active" data-page="today">
+          <article class="hero-card">
+            <div class="hero-top">
+              <span id="dayBadge" class="pill">DAY — / 71</span
+              ><span id="todayDate" class="muted"></span>
+            </div>
+            <h1 id="todayCity">—</h1>
+            <p id="todaySummary" class="hero-summary">—</p>
+            <div class="meta-grid">
+              <div><span>阶段</span><strong id="stageRange">—</strong></div>
+              <div><span>风险</span><strong id="riskCount">0</strong></div>
+            </div>
+            <button id="editStageButton" class="secondary full" type="button">
+              编辑当前阶段
+            </button>
+          </article>
+
+          <section class="section-block">
+            <div class="section-head">
+              <h2>今日重点</h2>
+              <button id="addActionButton" class="text-button" type="button">
+                ＋ 待办
+              </button>
+            </div>
+            <div
+              id="priorityFilters"
+              class="filter-row"
+              aria-label="优先级筛选"
+            ></div>
+            <p id="queueSummary" class="muted small"></p>
+            <div id="dailyQueue" class="card-list"></div>
+          </section>
+
+          <section id="topRiskWrap" class="section-block" hidden>
+            <div class="section-head">
+              <h2>下一风险</h2>
+              <button class="text-button" data-nav="risks">查看全部</button>
+            </div>
+            <article id="topRisk" class="risk-card"></article>
+          </section>
+
+          <section class="section-block">
+            <div class="section-head">
+              <h2>今天</h2>
+              <span id="todayCount" class="muted"></span>
+            </div>
+            <div id="todayAgenda" class="card-list empty-state">
+              暂无手动事项
+            </div>
+            <div class="quick-grid">
+              <button id="addEventButton" class="quick" type="button">
+                <b>＋</b><span>会面 / 事项</span>
+              </button>
+              <button id="addTravelButton" class="quick" type="button">
+                <b>＋</b><span>交通</span>
+              </button>
+            </div>
+          </section>
+
+          <section class="section-block">
+            <details>
+              <summary>所有活动与待办</summary>
+              <label
+                >搜索记录<input
+                  id="recordSearch"
+                  type="search"
+                  placeholder="标题、成果、人物"
+              /></label>
+              <label
+                >查看<select id="recordFilter">
+                  <option value="Upcoming">Upcoming · 待发生</option>
+                  <option value="Done">Done · 已发生</option>
+                  <option value="Follow-up">Follow-up · 跟进中</option>
+                  <option value="actions">全部待办</option>
+                  <option value="waiting">Waiting For</option>
+                  <option value="due">今天到期</option>
+                  <option value="overdue">逾期待办</option>
+                  <option value="future">未来待办</option>
+                  <option value="undated">未定期待办</option>
+                  <option value="closed">已关闭档案</option>
+                </select></label
+              >
+              <div id="recordList" class="card-list"></div>
+            </details>
+          </section>
+          <section class="section-block">
+            <div class="section-head">
+              <h2>当前阶段</h2>
+              <span class="muted">单一数据源</span>
+            </div>
+            <div id="stageCard" class="detail-card"></div>
+          </section>
+        </section>
+
+        <section class="page" data-page="risks">
+          <div class="page-title">
+            <p class="eyebrow">FEASIBILITY RADAR</p>
+            <h1>风险</h1>
+            <p>只显示真正需要你注意的冲突和转场风险。</p>
+          </div>
+          <div id="riskList" class="card-list"></div>
+        </section>
+
+        <section class="page" data-page="people">
+          <div class="page-title">
+            <p class="eyebrow">RELATIONSHIP MEMORY</p>
+            <h1>人脉</h1>
+            <p>会前十秒，知道上次发生了什么、谁欠谁什么。</p>
+          </div>
+          <div class="search-row">
+            <input
+              id="peopleSearch"
+              type="search"
+              placeholder="搜索姓名、别名、公司"
+            /><button id="addPersonButton" class="primary" type="button">
+              新增
+            </button>
+          </div>
+          <div id="peopleList" class="card-list"></div>
+        </section>
+
+        <section class="page" data-page="settings">
+          <div class="page-title">
+            <p class="eyebrow">SAFETY & RECOVERY</p>
+            <h1>设置</h1>
+            <p>备份、恢复、变更历史都在这里。</p>
+          </div>
+          <section class="settings-group">
+            <h2>备份与恢复</h2>
+            <button id="backupButton" class="primary full" type="button">
+              创建加密备份
+            </button>
+            <label class="file-button"
+              >恢复备份<input
+                id="restoreInput"
+                type="file"
+                accept="application/json,.json"
+                hidden
+            /></label>
+            <p id="backupMeta" class="muted small"></p>
+          </section>
+          <section class="settings-group">
+            <div class="section-head">
+              <h2>变更历史</h2>
+              <button id="undoButton" class="text-button" type="button">
+                撤销最近一次
+              </button>
+            </div>
+            <div id="historyList" class="card-list"></div>
+          </section>
+          <section class="settings-group">
+            <h2>本机安全</h2>
+            <p class="small">
+              个人数据以 AES-GCM
+              加密后保存在浏览器。当前仓库和公开页面不包含你在 OS
+              中输入的个人数据。
+            </p>
+          </section>
+        </section>
+      </main>
+
+      <nav class="bottom-nav" aria-label="主导航">
+        <button class="active" data-nav="today"><span>今</span>今日</button>
+        <button data-nav="risks"><span>险</span>风险</button>
+        <button data-nav="people"><span>人</span>人脉</button>
+        <button data-nav="settings"><span>设</span>设置</button>
+      </nav>
+    </div>
+
+    <dialog id="stageDialog">
+      <form method="dialog" id="stageForm" class="dialog-form">
+        <div class="dialog-head">
+          <div>
+            <p class="eyebrow">QUICK EDIT</p>
+            <h2>编辑阶段</h2>
+          </div>
+          <button type="button" class="icon-button" data-dismiss>关闭</button>
+        </div>
+        <input id="stageId" type="hidden" />
+        <label>城市<input id="stageCity" required /></label>
+        <div class="two">
+          <label>开始日期<input id="stageStart" type="date" required /></label
+          ><label>结束日期<input id="stageEnd" type="date" required /></label>
+        </div>
+        <label
+          >变更原因（可选）<input id="stageReason" placeholder="例如：行程调整"
+        /></label>
+        <button id="previewStageButton" type="button" class="primary big">
+          预览影响
+        </button>
+      </form>
+    </dialog>
+
+    <dialog id="impactDialog">
+      <div class="dialog-form">
+        <div class="dialog-head">
+          <div>
+            <p class="eyebrow">CHANGE IMPACT</p>
+            <h2>这次修改会影响</h2>
+          </div>
+          <button class="icon-button" data-close="impactDialog">关闭</button>
+        </div>
+        <div id="impactBody" class="impact-grid"></div>
+        <div class="dialog-actions">
+          <button class="secondary" data-close="impactDialog">取消</button
+          ><button id="applyStageButton" class="primary">保存修改</button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="eventDialog"></dialog>
+
+    <dialog id="travelDialog"></dialog>
+
+    <dialog id="personDialog">
+      <form method="dialog" id="personForm" class="dialog-form">
+        <div class="dialog-head">
+          <div>
+            <p class="eyebrow">RELATIONSHIP</p>
+            <h2>新增人物</h2>
+          </div>
+          <button type="button" class="icon-button" data-dismiss>关闭</button>
+        </div>
+        <label>姓名<input id="personName" required /></label>
+        <label
+          >别名（逗号分隔）<input
+            id="personAliases"
+            placeholder="Allen, 吴 Allen"
+        /></label>
+        <label>公司 / 机构<input id="personOrg" /></label>
+        <label
+          >关系标签<input id="personTags" placeholder="投资人, 硅谷"
+        /></label>
+        <label>下次联系<input id="personNextTouch" type="date" /></label>
+        <button class="primary big" type="submit">保存</button>
+      </form>
+    </dialog>
+
+    <dialog id="personDetailDialog">
+      <div class="dialog-form">
+        <div class="dialog-head">
+          <div>
+            <p class="eyebrow">RELATIONSHIP MEMORY</p>
+            <h2 id="personDetailName">—</h2>
+          </div>
+          <button class="icon-button" data-close="personDetailDialog">
+            关闭
+          </button>
+        </div>
+        <div id="personDetailBody"></div>
+        <div class="quick-grid">
+          <button id="addInteractionButton" class="quick" type="button">
+            <b>＋</b><span>记录互动</span></button
+          ><button id="addOpenLoopButton" class="quick" type="button">
+            <b>＋</b><span>新增 Open Loop</span>
+          </button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="interactionDialog">
+      <form method="dialog" id="interactionForm" class="dialog-form">
+        <div class="dialog-head">
+          <div>
+            <p class="eyebrow">TIMELINE</p>
+            <h2>记录互动</h2>
+          </div>
+          <button type="button" class="icon-button" data-dismiss>关闭</button>
+        </div>
+        <label
+          >时间<input
+            id="interactionAt"
+            type="datetime-local"
+            required /></label
+        ><label
+          >内容<textarea
+            id="interactionText"
+            rows="4"
+            required
+            placeholder="例如：Zoom 48 分钟，讨论中国企业软件投资"
+          ></textarea></label
+        ><button class="primary big" type="submit">保存</button>
+      </form>
+    </dialog>
+
+    <dialog id="loopDialog"></dialog>
+
+    <dialog id="restoreDialog">
+      <div class="dialog-form">
+        <div class="dialog-head">
+          <div>
+            <p class="eyebrow">RESTORE PREVIEW</p>
+            <h2>恢复备份</h2>
+          </div>
+          <button class="icon-button" data-close="restoreDialog">关闭</button>
+        </div>
+        <div id="restoreBody"></div>
+        <div class="dialog-actions">
+          <button class="secondary" data-close="restoreDialog">取消</button
+          ><button id="restoreConfirmButton" class="primary">恢复数据</button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="activityDialog">
+      <div class="dialog-form" id="activityDialogBody"></div>
+    </dialog>
+    <dialog id="prepDialog">
+      <div class="dialog-form" id="prepDialogBody"></div>
+    </dialog>
+    <dialog id="readinessDialog">
+      <div class="dialog-form" id="readinessDialogBody"></div>
+    </dialog>
+    <dialog id="completionDialog">
+      <div class="dialog-form" id="completionDialogBody"></div>
+    </dialog>
+    <dialog id="notesDialog">
+      <div class="dialog-form" id="notesDialogBody"></div>
+    </dialog>
+    <dialog id="followupDialog">
+      <div class="dialog-form" id="followupDialogBody"></div>
+    </dialog>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="app/os.mjs"></script>
+  </body>
+</html>
