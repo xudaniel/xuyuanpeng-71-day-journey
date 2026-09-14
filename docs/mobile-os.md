@@ -1,6 +1,12 @@
 # Mobile 71-Day OS
 
-Open `os.html` and unlock the device vault. The app is a static, device-local execution system: personal records stay encrypted in this browser, with portable encrypted backups. The public itinerary and existing `private.html` are unchanged.
+Open `os.html` and unlock the device vault. The app is a static, device-local execution system: personal records stay encrypted in this browser, with portable encrypted backups. The OS loads its base route from `data/journey.json`. The password-protected public itinerary (`index.html`) and independently encrypted full itinerary (`private.html`) are separate entry points.
+
+## Current route (15 September 2026)
+
+The trip remains 25 August–3 November: 71 days, 12 stages and 14 city nodes. Shenzhen is 13–29 September, Fuzhou is 30 September–7 October, and Shenzhen resumes 8–22 October. Japan starts 23 October. See [the current itinerary](itinerary.md) and [travel checks](outcomes/follow-ups.md#行程变更待核对).
+
+Base-route updates do not create bookings or overwrite encrypted personal events, actions or device-specific stage edits. A saved stage override may differ from the base route; review it in Settings if the displayed dates differ. The public-page access password and the device-vault password are separate.
 
 ## Daily use
 
@@ -60,7 +66,7 @@ Unit tests cover the four review regressions, queue counts/de-duplication, date 
 
 The browser workflow uses synthetic records at 375px and 1280px: stage rejection; 80%/100% prep; explicit completion; outcomes; two follow-ups with blocked closure and reopening; Tokyo–Toronto zones; CRM local time; encrypted refresh; storage failure; backup/restore; offline reload; lock; hidden lock-screen behavior and touch targets. It does not use the real `private.html` password or personal records. CI runs unit and browser checks and retains screenshots. The same workflow now also runs with WebKit at 375px with mobile/touch emulation, plus a 1280px layout check. Actual iPhone Safari has not been manually tested.
 
-Implementation is tracked in PR #17. #13 is tracked as a duplicate of #7/#8; #14 is tracked as a duplicate of #9.
+Implementation was merged into `main` through PR #17. #13 is tracked as a duplicate of #7/#8; #14 is tracked as a duplicate of #9.
 
 
 ## Safari compatibility follow-up
