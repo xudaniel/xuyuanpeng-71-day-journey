@@ -3,13 +3,20 @@ import { createServer } from "node:http";
 import { readFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-const { chromium } = await import(
+const browserTypes = await import(
   process.env.PLAYWRIGHT_MODULE
     ? pathToFileURL(process.env.PLAYWRIGHT_MODULE).href
     : "playwright"
 );
 const root = path.resolve(fileURLToPath(new URL("..", import.meta.url)));
+let originUnavailable = false,
+  unavailableRequests = 0;
 const server = createServer(async (req, res) => {
+  if (originUnavailable) {
+    unavailableRequests++;
+    req.socket.destroy();
+    return;
+  }
   try {
     const url = new URL(req.url, "http://localhost");
     const target = path.resolve(root, "." + decodeURIComponent(url.pathname));
@@ -33,7 +40,8 @@ const server = createServer(async (req, res) => {
 });
 await new Promise((r) => server.listen(0, "127.0.0.1", r));
 const url = `http://127.0.0.1:${server.address().port}/os.html`;
-const browser = await chromium.launch({
+const browserName = process.env.BROWSER_ENGINE || "chromium";
+const browser = await browserTypes[browserName].launch({
   headless: true,
   ...(process.env.BROWSER_EXECUTABLE
     ? { executablePath: process.env.BROWSER_EXECUTABLE }
@@ -42,6 +50,9 @@ const browser = await chromium.launch({
 const context = await browser.newContext({
   viewport: { width: 375, height: 812 },
   timezoneId: "Asia/Shanghai",
+  isMobile: true,
+  hasTouch: true,
+  deviceScaleFactor: 2,
   acceptDownloads: true,
 });
 const page = await context.newPage(),
@@ -94,7 +105,7 @@ try {
   await close("stageDialog");
   console.log("PASS: stage overlap rejected");
   // Create a meeting through the actual mobile form.
-  await page.locator("#addEventButton").click();
+  await page.locator("#addEventButton").tap();
   await field("eventDialog", "title").fill("Synthetic Tencent");
   await field("eventDialog", "date").fill(date);
   await field("eventDialog", "start").fill("14:00");
@@ -230,6 +241,42 @@ try {
   assert.equal(s.travel[0].arrivalDate, "2026-10-25");
   await close("activityDialog");
   console.log("PASS: international travel confirmation");
+  // A stay's hidden transport fields are disabled and never invent check-in times.
+  await page.locator("#addTravelButton").tap();
+  await field("travelDialog", "title").fill("Synthetic hotel");
+  await field("travelDialog", "type").selectOption("stay");
+  assert.equal(await field("travelDialog", "departureTime").isDisabled(), true);
+  await field("travelDialog", "date").fill("2026-09-23");
+  await submit("travelDialog");
+  let stay = (await readState()).travel.find(
+    (r) => r.title === "Synthetic hotel",
+  );
+  assert.equal(stay.departureTime, undefined);
+  assert.equal(stay.arrivalTime, undefined);
+  // An acknowledged buffer is reevaluated after a timing edit.
+  for (const [title, start, end] of [
+    ["Buffer A", "18:00", "19:00"],
+    ["Buffer B", "19:20", "20:00"],
+  ]) {
+    await page.locator("#addEventButton").tap();
+    await field("eventDialog", "title").fill(title);
+    await field("eventDialog", "start").fill(start);
+    await field("eventDialog", "end").fill(end);
+    await submit("eventDialog");
+  }
+  page.once("dialog", (dialog) =>
+    dialog.accept("Reviewed this 20-minute buffer"),
+  );
+  await page.locator("#topRisk button").tap();
+  await page.locator("#topRiskWrap").waitFor({ state: "hidden" });
+  const eventB = (await readState()).events.find((r) => r.title === "Buffer B");
+  await page.locator(`#todayAgenda [data-record="${eventB.id}"]`).tap();
+  await page.locator("#activityDialog [data-edit]").tap();
+  await field("eventDialog", "start").fill("19:01");
+  await submit("eventDialog");
+  await close("activityDialog");
+  assert.match(await page.locator("#topRisk").innerText(), /1 分钟/);
+  console.log("PASS: stays omit hidden defaults; edited risks reappear");
   // Datetime-local defaults use wall time; interaction persists an unambiguous instant.
   await page.locator(".bottom-nav [data-nav=people]").click();
   await page.locator("#addPersonButton").click();
@@ -294,18 +341,37 @@ try {
   await page.locator("#restoreDialog").waitFor({ state: "hidden" });
   assert.equal((await readState()).actions.length, 2);
   await page.evaluate(() => navigator.serviceWorker.ready);
-  await context.setOffline(true);
+  assert.deepEqual(
+    await page.evaluate(async () => ({
+      controller: !!navigator.serviceWorker.controller,
+      html: !!(await caches.match(location.href)),
+      execution: !!(await caches.match(
+        new URL("./app/execution.mjs", location.href).href,
+      )),
+    })),
+    { controller: true, html: true, execution: true },
+  );
+  // WebKit offline emulation failed before SW navigation on macOS. A real
+  // origin outage exercises cached reload without intercepting browser requests.
+  if (browserName === "webkit") originUnavailable = true;
+  else await context.setOffline(true);
   await page.reload();
   await unlock();
   assert.equal(
     (await readState()).travel[0].arrivalTimeZone,
     "America/Toronto",
   );
+  if (browserName === "webkit")
+    assert.ok(
+      unavailableRequests > 0,
+      "Offline reload must attempt the unavailable origin",
+    );
+  originUnavailable = false;
   await context.setOffline(false);
   await page.locator(".bottom-nav [data-nav=today]").click();
   await mkdir(path.join(root, "test-results"), { recursive: true });
   await page.screenshot({
-    path: path.join(root, "test-results/mobile.png"),
+    path: path.join(root, `test-results/mobile-${browserName}.png`),
     fullPage: true,
   });
   for (const width of [375, 1280]) {
@@ -333,7 +399,7 @@ try {
 } catch (error) {
   await mkdir(path.join(root, "test-results"), { recursive: true });
   await page.screenshot({
-    path: path.join(root, "test-results/failure.png"),
+    path: path.join(root, `test-results/failure-${browserName}.png`),
     fullPage: true,
   });
   console.error(

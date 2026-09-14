@@ -430,3 +430,66 @@ test("old mobile vault migration is idempotent, leaves input intact, and never f
   assert.equal(s.actions[0].dueDate, "2026-09-01");
   assert.throws(() => E.migrateState({ ...old, schemaVersion: 99 }), /版本/);
 });
+
+test("changing a confirmed transport mode invalidates booking, prep and readiness", () => {
+  const s = blank();
+  let t = makeTravel(s, {
+    mode: "flight",
+    status: "confirmed",
+    reference: "Flight receipt",
+  });
+  E.setPrep(
+    s,
+    "travel",
+    t.id,
+    t.prep.map((p) => ({ ...p, status: "done" })),
+  );
+  E.transition(s, "travel", t.id, "Prepared", {}, now);
+  E.saveReadiness(s, "travel", t.id, { host: "Original host" });
+  t = E.putActivity(s, "travel", { ...t, mode: "train" }, now);
+  assert.equal(t.status, "pending");
+  assert.equal(t.stage, "Planned");
+  assert.equal(E.prepScore(t).percent, 0);
+  assert.deepEqual(t.readinessData, {});
+  assert.ok(E.readinessScore(t, "travel").missing.includes("票务确认"));
+  assert.equal(t.reference, "Flight receipt"); // Historical evidence is retained, not treated as a new confirmation.
+});
+
+test("stays never inherit transport defaults, including legacy records and 24-hour readiness boundaries", () => {
+  const s = blank();
+  const stay = makeTravel(s, {
+    type: "stay",
+    date: "2026-09-23",
+    departureTime: "12:00",
+    arrivalTime: "14:00",
+  });
+  assert.equal(stay.departureTime, undefined);
+  assert.equal(stay.arrivalTime, undefined);
+  assert.equal(stay.arrivalDate, undefined);
+  assert.equal(
+    E.activityInstant(stay, "travel"),
+    Date.parse("2026-09-23T00:00+08:00"),
+  );
+  assert.equal(
+    E.dashboard(s, new Date("2026-09-22T00:00+08:00")).rows[0].priority,
+    "P0",
+  );
+  assert.equal(
+    E.dashboard(s, new Date("2026-09-21T23:59+08:00")).rows[0].priority,
+    "P1",
+  );
+  const old = defaultState();
+  old.travel.push({
+    ...stay,
+    departureTime: "12:00",
+    arrivalTime: "14:00",
+    departureTimeZone: "America/Toronto",
+  });
+  const migrated = E.migrateState(old);
+  assert.equal(migrated.travel[0].departureTime, undefined);
+  assert.equal(
+    E.activityInstant(old.travel[0], "travel"),
+    Date.parse("2026-09-23T00:00+08:00"),
+  );
+  assert.equal(old.travel[0].departureTime, "12:00");
+});

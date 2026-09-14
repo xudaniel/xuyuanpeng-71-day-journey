@@ -2,6 +2,7 @@
 // mobile OS events/travel/actions collections; no second vault or activity copy.
 import {
   dateOnly,
+  calendarDay,
   todayInZone,
   zonedEpochMinutes,
   travelInterval,
@@ -74,12 +75,7 @@ export function validateDeadline(value) {
     throw new Error("定时期限必须包含有效时间和时区。");
   validDate(value.slice(0, 10));
 }
-export const deadlineDay = (value) =>
-  !value
-    ? ""
-    : value.length === 10
-      ? value
-      : todayInZone("Asia/Shanghai", new Date(value));
+export const deadlineDay = (value) => calendarDay(value);
 export const overdue = (value, date, now = new Date()) =>
   !!value && (value.length === 10 ? value < date : Date.parse(value) < +now);
 export const deadlineInstant = (value) =>
@@ -119,6 +115,21 @@ export function newActivity(input = {}) {
     ...input,
   };
 }
+function normalizeStay(record) {
+  if (record.type === "stay")
+    for (const key of [
+      "mode",
+      "departureTime",
+      "arrivalTime",
+      "arrivalDate",
+      "departureTimeZone",
+      "arrivalTimeZone",
+      "from",
+      "to",
+    ])
+      delete record[key];
+  return record;
+}
 export function migrateState(input) {
   if (input?.schemaVersion !== 1)
     throw new Error("不支持的保险库版本，请保留原备份。");
@@ -145,15 +156,17 @@ export function migrateState(input) {
   }
   s.stageOverrides ||= {};
   s.events = s.events.map((r) => newActivity(r));
-  s.travel = s.travel.map((r) =>
-    newActivity({
-      kind: "trip",
-      type: "transport",
-      status: "unknown",
-      nextAction: "核对预订",
-      ...r,
-    }),
-  );
+  s.travel = s.travel
+    .map((r) =>
+      newActivity({
+        kind: "trip",
+        type: "transport",
+        status: "unknown",
+        nextAction: "核对预订",
+        ...r,
+      }),
+    )
+    .map(normalizeStay);
   s.actions = s.actions.map((r) => ({
     priority: "P1",
     status: "open",
@@ -286,6 +299,7 @@ export function putActivity(s, collection, input, now = new Date()) {
     member(r.status, ["unknown", "pending", "confirmed", "canceled"]);
     validateDeadline(r.dueDate);
     if (r.type === "transport") travelInterval(r);
+    else normalizeStay(r);
     if (["confirmed", "canceled"].includes(r.status))
       required(
         r.reference,
@@ -308,6 +322,7 @@ export function putActivity(s, collection, input, now = new Date()) {
           "from",
           "to",
           "type",
+          "mode",
         ];
   if (old && timingKeys.some((k) => r[k] !== old[k])) {
     r.readinessData = {};
@@ -488,6 +503,8 @@ export function saveNotes(s, collection, id, notes) {
 }
 export function activityInstant(r, collection) {
   if (!r.date) return null;
+  if (collection === "travel" && r.type === "stay")
+    return zonedEpochMinutes(r.date, "00:00", "Asia/Shanghai") * 60000;
   return (
     zonedEpochMinutes(
       r.date,

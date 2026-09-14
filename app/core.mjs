@@ -29,6 +29,16 @@ export function todayInZone(timeZone = "Asia/Shanghai", now = new Date()) {
   return `${parts.year}-${parts.month}-${parts.day}`;
 }
 
+// Date-only values keep their calendar day; timed values use the journey zone.
+export function calendarDay(value, timeZone = "Asia/Shanghai") {
+  if (!value) return "";
+  if (value.length === 10) {
+    dateOnly(value);
+    return value;
+  }
+  return todayInZone(timeZone, new Date(value));
+}
+
 export function validateJourneyData(data) {
   const errors = [];
   if (!data || data.schemaVersion !== SCHEMA_VERSION)
@@ -255,8 +265,33 @@ export function detectConflicts(state, options = {}) {
     }
     active.push(b);
   }
+  const byId = new Map(items.map((item) => [item.id, item]));
+  for (const risk of risks) {
+    risk.fingerprint = JSON.stringify([
+      risk.kind,
+      risk.level,
+      risk.gap ?? null,
+      risk.required ?? null,
+      risk.items.map((id) => {
+        const item = byId.get(id);
+        return [
+          id,
+          item.type,
+          item.start,
+          item.end,
+          item.location,
+          item.source.to || "",
+          item.source.mode || "",
+        ];
+      }),
+    ]);
+  }
+  // Legacy pair-only acknowledgements cannot prove this schedule was reviewed.
   return risks.filter(
-    (r) => !(state.riskOverrides || []).some((o) => o.riskId === r.id),
+    (r) =>
+      !(state.riskOverrides || []).some(
+        (o) => o.riskId === r.id && o.fingerprint === r.fingerprint,
+      ),
   );
 }
 
@@ -314,7 +349,8 @@ export function impactOfStageChange(seed, state, stageId, patch) {
   const counts = { events: 0, travel: 0, actions: 0, notes: 0 };
   for (const e of state.events || []) if (inside(e.date)) counts.events++;
   for (const t of state.travel || []) if (inside(t.date)) counts.travel++;
-  for (const a of state.actions || []) if (inside(a.dueDate)) counts.actions++;
+  for (const a of state.actions || [])
+    if (inside(calendarDay(a.dueDate, seed.trip.timeZone))) counts.actions++;
   for (const n of state.notes || []) if (n.stageId === stageId) counts.notes++;
   const preview = structuredClone(state);
   preview.stageOverrides = {

@@ -49,14 +49,27 @@ Node 22+ and pnpm 11:
 ```sh
 pnpm install --frozen-lockfile
 pnpm test
-pnpm exec playwright install chromium
+pnpm exec playwright install chromium webkit
 pnpm test:browser
+BROWSER_ENGINE=webkit pnpm test:browser
 ```
 
 `PLAYWRIGHT_MODULE` and `BROWSER_EXECUTABLE` optionally select installed browser tooling. Production has no runtime package dependencies.
 
 Unit tests cover the four review regressions, queue counts/de-duplication, date and timed deadlines, 24/72-hour boundaries, preparation, evidence, full lifecycle/closure/reopening, bookings, migration, encrypted round trips, wrong passwords, failed saves and stale windows.
 
-The browser workflow uses synthetic records at 375px and 1280px: stage rejection; 80%/100% prep; explicit completion; outcomes; two follow-ups with blocked closure and reopening; Tokyo–Toronto zones; CRM local time; encrypted refresh; storage failure; backup/restore; offline reload; lock; hidden lock-screen behavior and touch targets. It does not use the real `private.html` password or personal records. CI runs unit and browser checks and retains screenshots. Actual iPhone Safari has not been manually tested.
+The browser workflow uses synthetic records at 375px and 1280px: stage rejection; 80%/100% prep; explicit completion; outcomes; two follow-ups with blocked closure and reopening; Tokyo–Toronto zones; CRM local time; encrypted refresh; storage failure; backup/restore; offline reload; lock; hidden lock-screen behavior and touch targets. It does not use the real `private.html` password or personal records. CI runs unit and browser checks and retains screenshots. The same workflow now also runs with WebKit at 375px with mobile/touch emulation, plus a 1280px layout check. Actual iPhone Safari has not been manually tested.
 
 PR #17 remains unmerged. #13 is tracked as a duplicate of #7/#8; #14 is tracked as a duplicate of #9.
+
+
+## Safari compatibility follow-up
+
+The subsequent four P2 review findings are fixed and covered by 26 unit tests plus both Chromium and WebKit browser workflows:
+
+- Risk acknowledgements include a fingerprint of both intervals, locations, transport modes and the evaluated buffer. Changed risk conditions reappear. Old pair-only acknowledgements are kept in history but no longer silently suppress unverified schedules.
+- Changing transport mode invalidates a confirmed booking, preparation and readiness just like changing its endpoints. Old receipt evidence is retained while the booking becomes Pending.
+- Stay forms disable transport controls. Save and migration remove inherited departure/arrival defaults; date-only stays use the journey's calendar-day boundary rather than an invented check-in time.
+- Stage impact converts timed action deadlines to the journey timezone before testing the stage's inclusive date range.
+
+WebKit's offline emulation toggle produced an internal navigation error in the local Playwright build. The WebKit test therefore makes the test origin drop every connection, asserts that requests actually fail, and verifies cached reload, unlock and encrypted state restoration while the origin remains unavailable. Chromium additionally uses the browser's offline toggle. This tests the application's service-worker fallback; it does not claim physical iPhone airplane-mode testing. CI includes both browser workflows and retains separate screenshots.

@@ -190,3 +190,58 @@ test("datetime-local defaults preserve Shanghai wall time and local date boundar
     else process.env.TZ = before;
   }
 });
+
+test("ignored risks reappear when their schedule, locations or buffer requirements change", () => {
+  const state = core.defaultState();
+  state.events = [
+    { id: "a", date: "2026-09-22", start: "09:00", end: "10:00" },
+    { id: "b", date: "2026-09-22", start: "10:20", end: "11:00" },
+  ];
+  const risk = core.detectConflicts(state)[0];
+  state.riskOverrides = [{ riskId: risk.id, fingerprint: risk.fingerprint }];
+  assert.equal(core.detectConflicts(state).length, 0);
+  state.events[1].start = "10:01";
+  assert.equal(core.detectConflicts(state)[0].level, "critical");
+  state.events[1].start = "10:20";
+  assert.equal(core.detectConflicts(state).length, 0);
+  state.events[0].location = "A";
+  state.events[1].location = "B";
+  assert.equal(core.detectConflicts(state)[0].required, 60);
+  state.events[0].location = "";
+  state.events[1].location = "";
+  assert.equal(
+    core.detectConflicts(state, { defaultMeetingBuffer: 45 })[0].required,
+    45,
+  );
+  state.riskOverrides = [{ riskId: risk.id }];
+  assert.equal(core.detectConflicts(state).length, 1);
+});
+
+test("stage impact counts timed deadlines by the journey timezone including both boundary days", () => {
+  const state = core.defaultState();
+  state.actions = [
+    { id: "start", dueDate: "2026-09-12T16:15:00Z" },
+    { id: "end", dueDate: "2026-10-22T15:59:00Z" },
+    { id: "date-only", dueDate: "2026-10-22" },
+    { id: "next-day", dueDate: "2026-10-22T16:00:00Z" },
+    { id: "previous-day", dueDate: "2026-09-12T15:59:00Z" },
+    { id: "undated" },
+  ];
+  assert.equal(
+    core.impactOfStageChange(seed, state, "stage-06-shenzhen-long", {
+      city: "Shenzhen",
+    }).counts.actions,
+    3,
+  );
+  const custom = {
+    ...seed,
+    trip: { ...seed.trip, timeZone: "America/Toronto" },
+  };
+  state.actions = [{ id: "toronto-end", dueDate: "2026-10-23T03:59:00Z" }];
+  assert.equal(
+    core.impactOfStageChange(custom, state, "stage-06-shenzhen-long", {
+      city: "Shenzhen",
+    }).counts.actions,
+    1,
+  );
+});

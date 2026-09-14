@@ -287,6 +287,7 @@ function renderRiskCard(el, r) {
           s.riskOverrides.push({
             id: uid("risk"),
             riskId: r.id,
+            fingerprint: r.fingerprint,
             reason,
             at: new Date().toISOString(),
           }),
@@ -494,6 +495,9 @@ function openTravel(id) {
   const toggle = () => {
     const hidden = form.elements.type.value === "stay";
     $("transportFields").hidden = hidden;
+    $("transportFields")
+      .querySelectorAll("input,select")
+      .forEach((control) => (control.disabled = hidden));
     for (const name of ["departureTime", "arrivalTime", "arrivalDate"])
       form.elements[name].required = !hidden;
   };
