@@ -1,5 +1,11 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),crypto=require('node:crypto');
-const root=path.join(__dirname,'..'),publicHtml=fs.readFileSync(root+'/index.html','utf8'),gate=fs.readFileSync(root+'/private.html','utf8');
+const root=path.join(__dirname,'..'),publicGate=fs.readFileSync(root+'/index.html','utf8'),gate=fs.readFileSync(root+'/private.html','utf8');
+const envelope=JSON.parse(publicGate.match(/<script id="sharePayload" type="application\/json">([\s\S]*?)<\/script>/)[1]);
+if(!process.env.PUBLIC_SHARE_PASSWORD)throw Error('Set PUBLIC_SHARE_PASSWORD to test the encrypted public itinerary.');
+const data=Buffer.from(envelope.payload,'base64');
+const decipher=crypto.createDecipheriv('aes-256-gcm',crypto.pbkdf2Sync(process.env.PUBLIC_SHARE_PASSWORD,Buffer.from(envelope.salt,'base64'),envelope.iterations,32,'sha256'),Buffer.from(envelope.iv,'base64'));
+decipher.setAuthTag(data.subarray(-16));
+const publicHtml=Buffer.concat([decipher.update(data.subarray(0,-16)),decipher.final()]).toString('utf8');
 const parse=html=>JSON.parse(html.match(/const itinerary\s*=\s*(\[[\s\S]*?\n\s*\]);/)[1]);
 const revised=parse(publicHtml);
 const script=gate.match(/<script>([\s\S]*?)<\/script>/)[1];

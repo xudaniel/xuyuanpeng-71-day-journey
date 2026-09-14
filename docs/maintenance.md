@@ -6,7 +6,7 @@
 
 | 版本 | 入口 | 适用场景 | 信息范围 |
 | --- | --- | --- | --- |
-| 手机安全分享版 | `index.html` | 日常查看、对外转发 | 仅展示概览与脱敏内容 |
+| 手机安全分享版 | `index.html` | 日常查看、对外转发 | 输入访问密码后展示概览与脱敏内容 |
 | 加密完整版 | `private.html` | 本人及授权人员使用 | 输入访问密码后，在浏览器本地解密完整行程 |
 
 当前 GitHub Pages 入口：
@@ -18,7 +18,7 @@
 
 ## 安全设计
 
-- 完整行程使用 **AES-256-GCM** 加密。
+- 公开版与完整版分别使用 **AES-256-GCM** 加密，密码与密文互相独立。
 - 密钥由访问密码通过 **PBKDF2-SHA-256（310,000 次迭代）** 派生。
 - 解密仅在访问者的浏览器内完成，页面不会上传或保存密码。
 - 公开版已移除确认号、交通班次、详细地址、联系人及其他敏感明文。
@@ -28,7 +28,7 @@
 
 ```text
 .
-├── index.html        # 手机安全分享版
+├── index.html        # 公开版密码入口及密文
 ├── private.html      # 加密完整版登录页及密文
 ├── assets/
 │   └── logo.jpg      # 品牌标识
@@ -53,3 +53,9 @@
 
 
 [返回行程资料首页](../README.md)
+
+## 更新加密公开版
+
+维护者在本机设置 `PUBLIC_SHARE_PASSWORD` 环境变量，用 `node scripts/share-page.mjs decrypt < index.html > test-results/public-edit.html` 解密，修改本机文件后，用 `node scripts/share-page.mjs encrypt < test-results/public-edit.html > test-results/index.next.html` 重新加密，再替换 `index.html`。不要把明文文件提交到仓库；`test-results/` 已被忽略。
+
+运行 `node --test tests/itinerary.test.cjs`（需要同一环境变量）可验证解密后的行程。访问密码不保存在浏览器中，刷新后需要重新输入。此入口不限制公开仓库历史或独立的 OS 行程数据访问。

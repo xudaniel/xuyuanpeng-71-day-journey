@@ -2,6 +2,7 @@ name: Mobile OS tests
 on:
   pull_request:
     paths:
+      - "index.html"
       - "os.html"
       - "app/**"
       - "data/**"
@@ -14,6 +15,7 @@ on:
   push:
     branches: [main, feature/mobile-71day-os]
     paths:
+      - "index.html"
       - "os.html"
       - "app/**"
       - "data/**"
