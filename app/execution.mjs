@@ -563,9 +563,17 @@ export function dashboard(s, now = new Date(), timeZone = "Asia/Shanghai") {
           : r.end
             ? zonedEpochMinutes(r.endDate || r.date, r.end, r.timeZone) * 60000
             : null;
+      const hasStartTime =
+        collection === "events"
+          ? !!r.start
+          : r.type !== "stay" && !!r.departureTime;
       const elapsed =
         instant !== null &&
-        (end && actualEnd !== null ? actualEnd < +now : scheduledDay < date);
+        (end && actualEnd !== null
+          ? actualEnd < +now
+          : hasStartTime
+            ? instant < +now
+            : scheduledDay < date);
       const hours =
         instant === null ? Infinity : Math.max(0, (instant - +now) / 3600000);
       let priority = r.priority || "P1",

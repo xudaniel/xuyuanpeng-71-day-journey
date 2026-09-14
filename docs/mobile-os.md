@@ -60,7 +60,7 @@ Unit tests cover the four review regressions, queue counts/de-duplication, date 
 
 The browser workflow uses synthetic records at 375px and 1280px: stage rejection; 80%/100% prep; explicit completion; outcomes; two follow-ups with blocked closure and reopening; Tokyo–Toronto zones; CRM local time; encrypted refresh; storage failure; backup/restore; offline reload; lock; hidden lock-screen behavior and touch targets. It does not use the real `private.html` password or personal records. CI runs unit and browser checks and retains screenshots. The same workflow now also runs with WebKit at 375px with mobile/touch emulation, plus a 1280px layout check. Actual iPhone Safari has not been manually tested.
 
-PR #17 remains unmerged. #13 is tracked as a duplicate of #7/#8; #14 is tracked as a duplicate of #9.
+Implementation is tracked in PR #17. #13 is tracked as a duplicate of #7/#8; #14 is tracked as a duplicate of #9.
 
 
 ## Safari compatibility follow-up
@@ -73,3 +73,8 @@ The subsequent four P2 review findings are fixed and covered by 26 unit tests pl
 - Stage impact converts timed action deadlines to the journey timezone before testing the stage's inclusive date range.
 
 WebKit's offline emulation toggle produced an internal navigation error in the local Playwright build. The WebKit test therefore makes the test origin drop every connection, asserts that requests actually fail, and verifies cached reload, unlock and encrypted state restoration while the origin remains unavailable. Chromium additionally uses the browser's offline toggle. This tests the application's service-worker fallback; it does not claim physical iPhone airplane-mode testing. CI includes both browser workflows and retains separate screenshots.
+
+
+## Final merge checks
+
+Two subsequent review fixes bring unit coverage to 27 tests. Editing the prominent target or check-in date now clears its old timed override; editing the timed control synchronizes the visible day. Chromium and WebKit verify a timed action can be rescheduled from the main date controls without the old timestamp silently winning. Start-only activities become “待核验” once their actual start instant passes; activities with an end still use that end, and date-only stays retain calendar-day semantics. Passing a scheduled instant never fabricates actual completion.

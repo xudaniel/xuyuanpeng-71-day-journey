@@ -833,6 +833,23 @@ function openAction(id, preset = {}) {
   };
   form.elements.status.onchange = toggle;
   toggle();
+  for (const [dayName, timeName] of [
+    ["dueDate", "dueAt"],
+    ["checkIn", "checkInAt"],
+  ]) {
+    const day = form.elements[dayName],
+      time = form.elements[timeName];
+    // Editing the prominent calendar field intentionally selects a date-only deadline.
+    day.addEventListener("input", () => {
+      time.value = "";
+      // Refresh WebKit's cached validity for a hidden, previously populated control.
+      time.defaultValue = "";
+    });
+    time.addEventListener("input", () => {
+      if (time.value && time.validity.valid)
+        day.value = E.deadlineDay(new Date(time.value).toISOString());
+    });
+  }
   form.querySelectorAll("[data-days]").forEach(
     (b) =>
       (b.onclick = () => {
@@ -841,6 +858,7 @@ function openAction(id, preset = {}) {
           Number(b.dataset.days),
         );
         form.elements.dueAt.value = "";
+        form.elements.dueAt.defaultValue = "";
       }),
   );
   if (link) {

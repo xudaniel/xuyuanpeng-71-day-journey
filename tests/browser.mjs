@@ -322,6 +322,37 @@ try {
     () => (Storage.prototype.setItem = window.originalSetItem),
   );
   await close("loopDialog");
+  // Date-only edits must override previously saved timed targets and check-ins.
+  const timedAction = (await readState()).actions.find(
+    (a) => a.title === "Synthetic deliver",
+  );
+  await page.locator(`#dailyQueue [data-record="${timedAction.id}"]`).tap();
+  await field("loopDialog", "status").selectOption("waiting");
+  await field("loopDialog", "waitingOn").fill("Synthetic host");
+  await field("loopDialog", "expected").fill("Updated slides");
+  await page.locator("#loopDialog details summary").click();
+  await field("loopDialog", "dueAt").fill(date + "T11:00");
+  await field("loopDialog", "checkInAt").fill(date + "T12:00");
+  await submit("loopDialog");
+  let timed = (await readState()).actions.find((a) => a.id === timedAction.id);
+  assert.equal(timed.dueDate, date + "T03:00:00.000Z");
+  assert.equal(timed.checkIn, date + "T04:00:00.000Z");
+  await page.locator(`#dailyQueue [data-record="${timedAction.id}"]`).tap();
+  await field("loopDialog", "dueDate").fill("2026-09-24");
+  await field("loopDialog", "checkIn").fill("2026-09-25");
+  assert.equal(await field("loopDialog", "dueAt").inputValue(), "");
+  assert.equal(await field("loopDialog", "checkInAt").inputValue(), "");
+  assert.equal(
+    await page
+      .locator("#loopDialog form")
+      .evaluate((form) => form.checkValidity()),
+    true,
+  );
+  await submit("loopDialog");
+  timed = (await readState()).actions.find((a) => a.id === timedAction.id);
+  assert.equal(timed.dueDate, "2026-09-24");
+  assert.equal(timed.checkIn, "2026-09-25");
+  console.log("PASS: visible date edits replace old timed deadlines");
   // Backup, encrypted reload, restore and PWA offline navigation.
   await page.locator(".bottom-nav [data-nav=settings]").click();
   const downloadPromise = page.waitForEvent("download");
@@ -397,6 +428,18 @@ try {
     "PASS: mobile lifecycle, waiting, travel zones, CRM wall time, failed save, backup/restore, reload, offline, lock and 375/1280px layouts",
   );
 } catch (error) {
+  console.error(
+    await page
+      .locator("dialog[open] input,dialog[open] select")
+      .evaluateAll((els) =>
+        els.map((el) => ({
+          name: el.name,
+          value: el.value,
+          valid: el.validity.valid,
+          message: el.validationMessage,
+        })),
+      ),
+  );
   await mkdir(path.join(root, "test-results"), { recursive: true });
   await page.screenshot({
     path: path.join(root, `test-results/failure-${browserName}.png`),

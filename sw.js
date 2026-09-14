@@ -1,4 +1,4 @@
-const CACHE = "71day-os-v3";
+const CACHE = "71day-os-v4";
 const ASSETS = [
   "./os.html",
   "./app/os.css",

@@ -493,3 +493,47 @@ test("stays never inherit transport defaults, including legacy records and 24-ho
   );
   assert.equal(old.travel[0].departureTime, "12:00");
 });
+
+test("start-only activities require verification after their instant while date-only records retain day semantics", () => {
+  const s = blank(),
+    m = makeEvent(s, "start-only", {
+      start: "09:00",
+      end: "",
+      location: "Room",
+    });
+  m.prep.forEach((p) => (p.status = "done"));
+  m.readinessData = Object.fromEntries(
+    E.MEETING_READINESS.map(([key]) => [key, true]),
+  );
+  assert.equal(
+    E.dashboard(s, new Date("2026-09-22T08:59+08:00")).rows.length,
+    0,
+  );
+  assert.equal(
+    E.dashboard(s, new Date("2026-09-22T09:00+08:00")).rows.length,
+    0,
+  );
+  let d = E.dashboard(s, now);
+  assert.deepEqual(d.rows[0].badges, ["待核验"]);
+  assert.equal(m.stage, "Planned");
+  assert.equal(m.actualAt, undefined);
+  m.timeZone = "America/Toronto";
+  assert.equal(E.dashboard(s, now).rows.length, 0);
+  m.timeZone = "Asia/Shanghai";
+  m.end = "11:00";
+  assert.equal(E.dashboard(s, now).rows.length, 0);
+  m.start = "";
+  m.end = "";
+  assert.ok(!E.dashboard(s, now).rows[0].badges.includes("待核验"));
+  const stay = makeTravel(s, { type: "stay", date: "2026-09-22" });
+  assert.ok(
+    !E.dashboard(s, now)
+      .rows.find((r) => r.id === stay.id)
+      .badges.includes("待核验"),
+  );
+  assert.ok(
+    E.dashboard(s, new Date("2026-09-23T00:00+08:00"))
+      .rows.find((r) => r.id === stay.id)
+      .badges.includes("待核验"),
+  );
+});
