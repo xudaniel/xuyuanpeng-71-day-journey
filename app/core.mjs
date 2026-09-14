@@ -9,7 +9,9 @@ export function uid(prefix='item') {
 export function dateOnly(value) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value || '')) throw new Error(`Invalid date: ${value}`);
   const [y,m,d] = value.split('-').map(Number);
-  return new Date(Date.UTC(y,m-1,d));
+  const date = new Date(Date.UTC(y,m-1,d));
+  if (!Number.isFinite(+date) || date.toISOString().slice(0,10)!==value) throw new Error(`Invalid date: ${value}`);
+  return date;
 }
 
 export function todayInZone(timeZone='Asia/Shanghai', now=new Date()) {
@@ -57,15 +59,39 @@ export function dayNumber(seed, date=todayInZone(seed.trip.timeZone)) {
   return Math.max(0, Math.min(71,n));
 }
 
-function minutes(v){if(v==null||v==='')return null;const [h,m]=v.split(':').map(Number);return h*60+m;}
-function zonedEpochMinutes(date,time,timeZone='Asia/Shanghai'){
-  const [y,m,d]=date.split('-').map(Number), [hh,mm]=(time||'00:00').split(':').map(Number);
-  const guess=Date.UTC(y,m-1,d,hh,mm);
-  const parts=new Intl.DateTimeFormat('en-CA',{timeZone,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(guess));
-  const map=Object.fromEntries(parts.filter(p=>p.type!=='literal').map(p=>[p.type,+p.value]));
-  const represented=Date.UTC(map.year,map.month-1,map.day,map.hour,map.minute);
-  const offset=represented-guess;
-  return Math.floor((guess-offset)/60000);
+export function localDateTimeValue(now=new Date()) {
+  const pad=n=>String(n).padStart(2,'0');
+  return `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+}
+
+export function zonedEpochMinutes(date,time='00:00',timeZone='Asia/Shanghai') {
+  dateOnly(date);
+  if(!/^([01]\d|2[0-3]):[0-5]\d$/.test(time)) throw new Error('请输入有效时间。');
+  const [y,m,d]=date.split('-').map(Number), [hh,mm]=time.split(':').map(Number);
+  const wall=Date.UTC(y,m-1,d,hh,mm);
+  const formatter=new Intl.DateTimeFormat('en-CA',{timeZone,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
+  const represented=epoch=>{
+    const p=Object.fromEntries(formatter.formatToParts(new Date(epoch)).filter(p=>p.type!=='literal').map(p=>[p.type,+p.value]));
+    return Date.UTC(p.year,p.month-1,p.day,p.hour,p.minute);
+  };
+  let candidate=wall;
+  for(let i=0;i<4;i++){
+    const difference=wall-represented(candidate);
+    if(!difference) return candidate/60000;
+    candidate+=difference;
+  }
+  throw new Error('该当地时间不存在（夏令时切换），请选择其他时间。');
+}
+
+export function travelInterval(leg) {
+  const departureZone=leg.departureTimeZone||leg.timeZone||'Asia/Shanghai';
+  const arrivalZone=leg.arrivalTimeZone||leg.timeZone||departureZone;
+  const start=zonedEpochMinutes(leg.date,leg.departureTime,departureZone);
+  let end=zonedEpochMinutes(leg.arrivalDate||leg.date,leg.arrivalTime||leg.departureTime,arrivalZone);
+  // Old records omitted arrivalDate and used an implicit overnight arrival.
+  if(end<start&&!leg.arrivalDate) end+=1440;
+  if(end<start) throw new Error('到达时刻早于出发时刻，请核对到达日期和两地时区。');
+  return {start,end};
 }
 
 export function detectConflicts(state, options={}) {
@@ -79,14 +105,17 @@ export function detectConflicts(state, options={}) {
     items.push({id:event.id,type:'event',title:event.title||'Event',date:event.date,start,end,location:event.location||'',source:event});
   }
   for(const leg of state.travel||[]) {
-    if(!leg.date||!leg.departureTime) continue;
-    const start=zonedEpochMinutes(leg.date,leg.departureTime,leg.departureTimeZone||leg.timeZone);let end=zonedEpochMinutes(leg.arrivalDate||leg.date,leg.arrivalTime||leg.departureTime,leg.arrivalTimeZone||leg.timeZone||leg.departureTimeZone);if(end<start&&!leg.arrivalDate)end+=1440;
+    if(leg.status==='canceled'||leg.type==='stay'||!leg.date||!leg.departureTime) continue;
+    const {start,end}=travelInterval(leg);
     items.push({id:leg.id,type:'travel',title:leg.title||`${leg.from||''} → ${leg.to||''}`,date:leg.date,start,end,location:leg.from||'',source:leg});
   }
   items.sort((a,b)=>a.start-b.start);
   const risks=[];
-  for(let i=0;i<items.length-1;i++){
-    const a=items[i], b=items[i+1];
+  let active=[];
+  const retention=Math.max(defaultMeetingBuffer,airportBuffer,stationBuffer,60);
+  for(const b of items){
+    active=active.filter(a=>a.end+retention>b.start);
+    for(const a of active){
     if(a.end>b.start){
       risks.push({id:`overlap:${a.id}:${b.id}`,level:'critical',kind:'overlap',title:'时间冲突',detail:`${a.title} 与 ${b.title} 时间重叠`,items:[a.id,b.id]});
       continue;
@@ -100,6 +129,8 @@ export function detectConflicts(state, options={}) {
     if(gap<required){
       risks.push({id:`buffer:${a.id}:${b.id}`,level:gap<Math.max(15,required/2)?'critical':'warning',kind:'buffer',title:'转场时间偏紧',detail:`${a.title} → ${b.title} 仅 ${gap} 分钟；建议至少 ${required} 分钟`,items:[a.id,b.id],gap,required});
     }
+    }
+    active.push(b);
   }
   return risks.filter(r=>!(state.riskOverrides||[]).some(o=>o.riskId===r.id));
 }
@@ -136,6 +167,12 @@ export function impactOfStageChange(seed,state,stageId,patch) {
   for(const n of state.notes||[]) if(n.stageId===stageId) counts.notes++;
   const preview=structuredClone(state);
   preview.stageOverrides={...(preview.stageOverrides||{}),[stageId]:{...(preview.stageOverrides?.[stageId]||{}),...patch}};
+  // Validate the complete canonical sequence with every existing override applied.
+  const sequence=seed.stages.map(s=>({...s,...preview.stageOverrides[s.id]}));
+  sequence.forEach((s,i)=>{
+    if(dateOnly(s.end)<dateOnly(s.start)) throw new Error('结束日期不能早于开始日期。');
+    if(i && dateOnly(s.start)<=dateOnly(sequence[i-1].end)) throw new Error(`阶段重叠或顺序无效：${sequence[i-1].city} / ${s.city}`);
+  });
   return {stage,before:{start:stage.start,end:stage.end,city:stage.city},after:{start:after.start,end:after.end,city:after.city},counts,newRisks:detectConflicts(preview).length-detectConflicts(state).length};
 }
 
