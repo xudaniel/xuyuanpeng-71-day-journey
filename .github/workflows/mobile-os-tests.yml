@@ -2,22 +2,29 @@ name: Mobile OS tests
 on:
   pull_request:
     paths:
-      - 'os.html'
-      - 'app/**'
-      - 'data/**'
-      - 'tests/**'
-      - 'manifest.webmanifest'
-      - 'sw.js'
-      - '.github/workflows/mobile-os-tests.yml'
+      - "os.html"
+      - "app/**"
+      - "data/**"
+      - "tests/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "manifest.webmanifest"
+      - "sw.js"
+      - ".github/workflows/mobile-os-tests.yml"
   push:
-    branches: [main]
+    branches: [main, feature/mobile-71day-os]
     paths:
-      - 'os.html'
-      - 'app/**'
-      - 'data/**'
-      - 'tests/**'
-      - 'manifest.webmanifest'
-      - 'sw.js'
+      - "os.html"
+      - "app/**"
+      - "data/**"
+      - "tests/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "manifest.webmanifest"
+      - "sw.js"
+      - ".github/workflows/mobile-os-tests.yml"
+permissions:
+  contents: read
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -25,11 +32,23 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: "22"
+      - uses: pnpm/action-setup@v4
+        with:
+          version: "11.19.0"
+      - run: pnpm install --frozen-lockfile
       - name: Syntax check
         run: |
-          node --check app/core.mjs
-          node --check app/storage.mjs
-          node --check app/os.mjs
+          for file in app/*.mjs sw.js; do node --check "$file"; done
       - name: Unit tests
-        run: node --test tests/os-core.test.mjs tests/storage.test.mjs
+        run: pnpm test
+      - name: Install browser
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Mobile and desktop browser workflow
+        run: pnpm test:browser
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mobile-os-browser-results
+          path: test-results/
+          if-no-files-found: ignore
