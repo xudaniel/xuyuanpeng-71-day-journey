@@ -20,13 +20,13 @@ function fixture(){
  ...revised.filter(s=>s.start>='2026-10-23')];
  return publicHtml.replace(/const itinerary\s*=\s*\[[\s\S]*?\n\s*\];/,()=>`const itinerary = ${JSON.stringify(stages,null,2)};`);
 }
-test('71 days have one stage each; all 40 pre-Japan days are Shenzhen',()=>{
+test('71 days have one stage each; Fuzhou covers September 30–October 7 with Shenzhen on both sides',()=>{
  let n=0;for(let d=new Date('2026-08-25T12:00Z');d<=new Date('2026-11-03T12:00Z');d.setUTCDate(d.getUTCDate()+1)){
  const date=d.toISOString().slice(0,10),found=revised.filter(s=>s.start<=date&&s.end>=date);assert.equal(found.length,1,date);
- if(date>='2026-09-13'&&date<'2026-10-23')assert.equal(found[0].city,'深圳',date);n++;
- }assert.equal(n,71);assert.equal(revised.length,10);
+ if(date>='2026-09-13'&&date<'2026-10-23')assert.equal(found[0].city,date>='2026-09-30'&&date<='2026-10-07'?'抚州':'深圳',date);n++;
+ }assert.equal(n,71);assert.equal(revised.length,12);
  assert.equal(revised.find(s=>s.start==='2026-10-23').city,'东京／東京');
- assert.equal(JSON.parse(publicHtml.match(/const cities=(\[[^\n]+\]);/)[1]).length,12);
+ assert.equal(JSON.parse(publicHtml.match(/const cities=(\[[^\n]+\]);/)[1]).length,14);
 });
 test('existing password flow decrypts, revises and then renders without losing unaffected details',async()=>{
  const plain=fixture(),password='test-only-password',salt=crypto.randomBytes(16),iv=crypto.randomBytes(12),iterations=310000;
@@ -39,8 +39,13 @@ test('existing password flow decrypts, revises and then renders without losing u
  assert.ok(written,'decrypted HTML rendered');const old=parse(plain),now=parse(written);
  assert.deepEqual(now.filter(s=>s.end<'2026-09-13'),old.filter(s=>s.end<'2026-09-13'));
  assert.deepEqual(now.filter(s=>s.start>='2026-10-23'),old.filter(s=>s.start>='2026-10-23'));
- const sz=now.find(s=>s.start==='2026-09-13');assert.ok(sz.details.includes('保留深圳内部会面资料'));assert.ok(sz.details.includes('保留十月深圳内部会面资料'));
- assert.ok(!JSON.stringify(sz).match(/抚州|香港|南京/));assert.equal(context.reviseItinerarySeptember14(written),written);
+ const sz=now.find(s=>s.start==='2026-09-13');assert.ok(sz.details.includes('保留深圳内部会面资料'));assert.ok(now.find(s=>s.start==='2026-10-08').details.includes('保留十月深圳内部会面资料'));
+ assert.ok(!JSON.stringify(sz).match(/香港|南京/));assert.equal(context.reviseItinerarySeptember15(written),written);assert.equal(context.reviseItinerarySeptember15(context.reviseItinerarySeptember14(written)),written);assert.deepEqual(now.map(({start,end,city})=>({start,end,city})),revised.map(({start,end,city})=>({start,end,city})));
  assert.throws(()=>context.reviseItinerarySeptember14('<html>unsupported</html>'),/route revision/);
  written=undefined;controls.password.value='wrong';await handler({preventDefault(){}});assert.equal(written,undefined);assert.match(controls.status.textContent,/密码不正确/);
+});
+
+test('OS seed matches the public itinerary dates and cities',()=>{
+ const seed=JSON.parse(fs.readFileSync(root+'/data/journey.json','utf8'));
+ assert.deepEqual(seed.stages.map(({start,end,city})=>({start,end,city})),revised.map(({start,end,city})=>({start,end,city})));
 });

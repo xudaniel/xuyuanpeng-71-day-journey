@@ -46,7 +46,7 @@ test("stage change impact and undo preserve canonical seed", () => {
     core
       .effectiveStages(seed, state)
       .find((s) => s.id === "stage-06-shenzhen-long").end,
-    "2026-10-22",
+    "2026-09-29",
   );
 });
 
@@ -221,9 +221,9 @@ test("stage impact counts timed deadlines by the journey timezone including both
   const state = core.defaultState();
   state.actions = [
     { id: "start", dueDate: "2026-09-12T16:15:00Z" },
-    { id: "end", dueDate: "2026-10-22T15:59:00Z" },
-    { id: "date-only", dueDate: "2026-10-22" },
-    { id: "next-day", dueDate: "2026-10-22T16:00:00Z" },
+    { id: "end", dueDate: "2026-09-29T15:59:00Z" },
+    { id: "date-only", dueDate: "2026-09-29" },
+    { id: "next-day", dueDate: "2026-09-29T16:00:00Z" },
     { id: "previous-day", dueDate: "2026-09-12T15:59:00Z" },
     { id: "undated" },
   ];
@@ -237,7 +237,7 @@ test("stage impact counts timed deadlines by the journey timezone including both
     ...seed,
     trip: { ...seed.trip, timeZone: "America/Toronto" },
   };
-  state.actions = [{ id: "toronto-end", dueDate: "2026-10-23T03:59:00Z" }];
+  state.actions = [{ id: "toronto-end", dueDate: "2026-09-30T03:59:00Z" }];
   assert.equal(
     core.impactOfStageChange(custom, state, "stage-06-shenzhen-long", {
       city: "Shenzhen",
